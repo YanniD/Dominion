@@ -7,7 +7,8 @@ package dominion;
 
 /**
  *
- * @author Yanni blblalal
+ * @author Yanni
+ */
 public class Dominion {
 
     /**
@@ -16,6 +17,5 @@ public class Dominion {
     public static void main(String[] args) {
         // TODO code application logic here
     }
-    
     
 }

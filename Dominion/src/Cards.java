@@ -11,4 +11,11 @@
 public class Cards {
     private int cost;
     private String title;
+    private int amount;
+    
+    public Cards(int cost, String title,int amount){
+        this.cost = cost;
+        this.title = title;
+        this.amount = amount;
+    }
 }
