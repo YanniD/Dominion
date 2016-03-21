@@ -7,7 +7,7 @@ package dominion;
 
 /**
  *
- * @author Yanni je ma is leuk
+ * @author Yanni
  */
 public class Dominion {
 
