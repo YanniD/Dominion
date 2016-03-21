@@ -9,5 +9,7 @@
  * @author Yanni
  */
 public class KingdomCards {
+    private int kingdomCardID;
+    private int waarde;
     
 }

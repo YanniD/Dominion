@@ -9,5 +9,7 @@
  * @author Yanni
  */
 public class VictoryCards {
-    
+    private static final int ESTATE = 1;
+    private static final int DUCHY = 3;
+    private static final int PROVINCE = 6;
 }

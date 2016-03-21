@@ -8,10 +8,16 @@
  *
  * @author Yanni
  */
-public class TreassureCards {
-    private static final int COPPER = 1;
-    private static final int SILVER = 2;
-    private static final int GOLD = 3;
+public class TreassureCards extends Cards{
+    private int worth;
     
-    
+    public TreassureCards(int cost, String title,int amount,int worth){
+        super(cost);
+        super(title);
+        super(amount);
+        this.worth = worth;
+    }
+    public int GetWorth(){
+        return worth;
+    } 
 }

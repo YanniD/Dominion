@@ -18,4 +18,16 @@ public class Cards {
         this.title = title;
         this.amount = amount;
     }
+    public int GetCost(){
+        return cost;
+    }
+    public String GetTitle(){
+        return title;
+    }
+    public int GetAmount(){
+        return amount;
+    }
+    public void DecrementAmount(){
+        amount--;
+    }
 }
