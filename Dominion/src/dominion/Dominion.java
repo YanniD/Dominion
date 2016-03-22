@@ -16,6 +16,14 @@ public class Dominion {
      */
     public static void main(String[] args) {
         // TODO code application logic here
+        testKingdomCards();
+    }
+    
+    public static void testKingdomCards()
+    {
+        Card estate = new Card(5 , "test" , 10);
+        System.out.println(estate.getTitle());
+    
     }
     
 }

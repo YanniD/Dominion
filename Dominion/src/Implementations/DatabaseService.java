@@ -17,7 +17,7 @@ import java.util.logging.Logger;
  *
  * @author Yanni
  */
-public class DatabaseService implements IDatabaseService {
+/*public class DatabaseService implements IDatabaseService {
 
     //http://www.connectionstrings.com/mysql/
     //Server=localhost;Database=myDataBase;Uid=root;Pwd=root;
@@ -85,3 +85,4 @@ public class DatabaseService implements IDatabaseService {
     }
     
 }
+*/ 
