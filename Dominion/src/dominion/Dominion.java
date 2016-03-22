@@ -16,6 +16,10 @@ public class Dominion {
      */
     public static void main(String[] args) {
         // TODO code application logic here
+        Set bigMoneySet = new Set();
+        System.out.println(bigMoneySet.getSet(bigMoneySet.getBigMoney(),8));
+        //testje voor kaarten te laten tonen
+        
     }
     
 }

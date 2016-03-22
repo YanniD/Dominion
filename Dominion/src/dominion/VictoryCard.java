@@ -8,8 +8,18 @@
  *
  * @author Yanni
  */
-public class VictoryCard {
-    private static final int ESTATE = 1;
-    private static final int DUCHY = 3;
-    private static final int PROVINCE = 6;
+public class VictoryCard extends Card{
+    private int victoryPoints;
+    
+    public VictoryCard(int cost, String title, int amount, int points){
+        super(cost, title, amount);
+        victoryPoints = points;
+    }
+    
+    /**
+     * returns victory points
+     */
+    public int getVP(){
+        return victoryPoints;
+    }
 }
