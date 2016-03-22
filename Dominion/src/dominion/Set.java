@@ -41,6 +41,8 @@ public class Set {
         return villageSquare;
     }
     
+
+    
     public String getSet(String[] Set , int i){
         
             return Set[i];

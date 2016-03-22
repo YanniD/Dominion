@@ -18,7 +18,7 @@ import java.util.logging.Logger;
  *
  * @author Yanni
  */
-public class DatabaseService implements IDatabaseService {
+/*public class DatabaseService implements IDatabaseService {
 
     //http://www.connectionstrings.com/mysql/
     //Server=localhost;Database=myDataBase;Uid=root;Pwd=root;
@@ -94,6 +94,10 @@ public class DatabaseService implements IDatabaseService {
     }
     
 }
+<<<<<<< HEAD
 
 //http://stackoverflow.com/questions/14704559/how-to-insert-image-in-mysql-databasetable foto toevoegen aan DB
 // http://stackoverflow.com/questions/3577848/generating-a-css-file-from-file-or-database-php css files toevoegen aan DB en ophalen voor website
+=======
+*/ 
+>>>>>>> ed5fd7672ac232189c5626c2efb41a4ece9d640e

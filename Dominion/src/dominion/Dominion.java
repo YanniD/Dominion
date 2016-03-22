@@ -16,10 +16,22 @@ public class Dominion {
      */
     public static void main(String[] args) {
         // TODO code application logic here
-        Set bigMoneySet = new Set();
-        System.out.println(bigMoneySet.getSet(bigMoneySet.getBigMoney(),8));
+        testAanmakenCards();
+        testGetKaartUitTest();
+       
         //testje voor kaarten te laten tonen
         
     }
     
+    public static void testAanmakenCards()
+    {
+        Card estate = new Card(5 , "test" , 10);
+        System.out.println(estate.getTitle());
+    
+    }
+    public static void testGetKaartUitTest()
+    {
+        Set bigMoneySet = new Set();
+        System.out.println(bigMoneySet.getSet(bigMoneySet.getBigMoney(),8));
+    }
 }

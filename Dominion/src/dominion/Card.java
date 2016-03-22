@@ -1,3 +1,5 @@
+package dominion;
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -18,16 +20,16 @@ public class Card {
         this.title = title;
         this.amount = amount;
     }
-    public int GetCost(){
+    public int getCost(){
         return cost;
     }
-    public String GetTitle(){
+    public String getTitle(){
         return title;
     }
-    public int GetAmount(){
+    public int getAmount(){
         return amount;
     }
-    public void DecrementAmount(){
+    public void decrementAmount(){
         amount--;
     }
     
