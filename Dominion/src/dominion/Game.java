@@ -3,13 +3,8 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package dominion;
 
-/**
- *
- * @author Kevin
- */
 public class Game {
     private int acties;
     private int buys;
@@ -38,8 +33,6 @@ public class Game {
     {
       acties--;   
     }
-            
-    
    
     public void incrementBuys(int buys)
     {
@@ -75,9 +68,6 @@ public class Game {
     
     
     //Einde van het spel
-    
-    
-    
     public void Endgame()
     {
 

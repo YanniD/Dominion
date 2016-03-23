@@ -5,10 +5,7 @@
  */
 package dominion;
 
-/**
- *
- * @author Yanni
- */
+
 public class Set {
     private String[] firstGame;
     private String[] bigMoney;
@@ -26,25 +23,25 @@ public class Set {
     
     public String[] getFirstGame(){
         return firstGame;
-       
     }
+    
     public String[] getBigMoney(){
         return bigMoney;
     }
+    
     public String[] getInteraction(){
         return interaction;
     }
+    
     public String[] getSizeDistortion(){
         return sizeDistortion;
     }
+    
     public String[] getVillageSquare(){
         return villageSquare;
     }
     
-
-    
     public String getSet(String[] Set , int i){
-        
-            return Set[i];
+        return Set[i];
     }
 }

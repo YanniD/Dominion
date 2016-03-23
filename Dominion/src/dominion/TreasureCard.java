@@ -6,15 +6,12 @@ package dominion;
  * and open the template in the editor.
  */
 
-/**
- *
- * @author Yanni
- */
+
 public class TreasureCard extends Card{
     private int worth;
     
-    public TreasureCard(int cost, String title,int amount,int worth){
-        super(cost, title, amount);
+    public TreasureCard(int cost, String title,int worth){
+        super(cost, title);
         this.worth = worth;
     }
     public int getWorth(){
