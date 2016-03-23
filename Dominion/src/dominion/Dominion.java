@@ -5,27 +5,20 @@
  */
 package dominion;
 
-/**
- *
- * @author Yanni
- */
+
 public class Dominion {
 
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        // TODO code application logic here
         testAanmakenCards();
         testGetKaartUitTest();
-       
-        //testje voor kaarten te laten tonen
-        
     }
     
     public static void testAanmakenCards()
     {
-        Card estate = new Card(5 , "test" , 10);
+        Card estate = new Card(5 , "test");
         System.out.println(estate.getTitle());
     
     }

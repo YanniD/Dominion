@@ -6,15 +6,11 @@ package dominion;
  * and open the template in the editor.
  */
 
-/**
- *
- * @author Yanni
- */
 public class VictoryCard extends Card{
     private int victoryPoints;
     
-    public VictoryCard(int cost, String title, int amount, int points){
-        super(cost, title, amount);
+    public VictoryCard(int cost, String title, int points){
+        super(cost, title);
         victoryPoints = points;
     }
     
