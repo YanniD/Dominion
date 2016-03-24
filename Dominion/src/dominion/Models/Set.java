@@ -24,24 +24,23 @@ public class Set {
         villageSquare = new String[] {"bureaucrat","cellar","festival","libary","market","remodel","smithy","throneRoom","village","woodcutter"};
     }
     
-    public String[] getFirstGame(){
-        return firstGame;
-       
-    }
-    public String[] getBigMoney(){
-        return bigMoney;
-    }
-    public String[] getInteraction(){
-        return interaction;
-    }
-    public String[] getSizeDistortion(){
-        return sizeDistortion;
-    }
-    public String[] getVillageSquare(){
-        return villageSquare;
+    public String[] getSet(int preSetChoice) {
+        switch(preSetChoice) {
+            case 1: return firstGame;
+            case 2: return bigMoney;
+            case 3: return interaction;        
+            case 4: return sizeDistortion;
+            case 5: return villageSquare;
+            default: System.out.println("Wrong preset");
+                     return null;
+        }
     }
     
-
+    public void showSetCards(String[] Set) {
+        for (int i = 0; i < Set.length; i++) {
+            System.out.println(getOneCardOfSet(Set,i));
+        }
+    }
     
     public String getOneCardOfSet(String[] Set , int i){
             return Set[i];

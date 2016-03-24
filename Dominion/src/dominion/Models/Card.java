@@ -21,13 +21,16 @@ public class Card {
         this.title = title;
         this.cardType = cardType;
     }
+    
+    public int getCardID(){
+        return cardID;
+    }
     public int getCost(){
         return cost;
     }
     public String getTitle(){
         return title;
     }
-    
     public CardType getType(){
         return this.cardType;
     }

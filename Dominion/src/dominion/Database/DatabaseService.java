@@ -31,13 +31,14 @@ public class DatabaseService {
     
     private Connection con;
  
-    public DatabaseService() throws SQLException, ClassNotFoundException{
-        
+    public DatabaseService(){
+        try{
         Class.forName("com.mysql.jdbc.Driver");
         con = DriverManager.getConnection(host,username,password);
-        
-        
-        
+        } catch(ClassNotFoundException e){            
+        } catch (SQLException ex) {
+        } 
+
     }
         
    /*@Override
@@ -55,8 +56,7 @@ public class DatabaseService {
             //Close statement & connection
             myStatement.close();
             myConnection.close();
-        }
-        catch(ClassNotFoundException e){
+        } catch(ClassNotFoundException e){
             return false;            
         } catch (SQLException ex) {
             return false;
@@ -65,51 +65,52 @@ public class DatabaseService {
         return true;
     }
 */
-    public ArrayList<dominion.Models.Card> FindCards()throws SQLException, ClassNotFoundException{
+    public ArrayList<Card> FindCards(){
         String query = BuildGetCardsQuery();    	
-        
-        Statement myStatement = con.createStatement();
-        //Execute statement
-        ResultSet rs = myStatement.executeQuery(query);     
-        ArrayList<dominion.Models.Card> cards = new ArrayList<dominion.Models.Card>();        
-        
-        while(rs.next()){
-            dominion.Models.Card card = CreateCard(rs);
-            cards.add(card);
-        }        
-
-        //Close statement & connection
-        myStatement.close();
-        
-        return cards;     
+        try{
+            Statement myStatement = con.createStatement();
+            //Execute statement
+            ResultSet rs = myStatement.executeQuery(query);  
+            ArrayList<Card> cards = new ArrayList<Card>();        
+            while(rs.next()){
+                Card card = CreateCard(rs);
+                cards.add(card);
+            }        
+            //Close statement & connection
+            myStatement.close();
+            return cards;     
+        } catch(SQLException e){
+            return null;
+        }
     }
       
     
-    public dominion.Models.Card FindCardByID(int cardID) throws SQLException, ClassNotFoundException{
-    	
+    public Card FindCardByID(int cardID){
         String query = BuildGetCardByIDQuery(cardID);
-    	
+    	try{
         Statement myStatement = con.createStatement();
         //Execute statement
         ResultSet rs = myStatement.executeQuery(query);  
         
-        dominion.Models.Card card = null;
+        Card card = null;
         while(rs.next()){        
             card = CreateCard(rs);
         }
         //Close statement & connection
         myStatement.close();
-        
-        return card;       
+        return card; 
+        } catch(SQLException e){
+            return null;
+        }
     }
     
-    private dominion.Models.Card CreateCard(ResultSet rs) throws SQLException, ClassNotFoundException{
-        dominion.Models.Card card;
+    private Card CreateCard(ResultSet rs){
+        try{
+        Card card;
         CardType cardType = CardType.values()[rs.getInt("Type")];        
         int cost = rs.getInt("Cost");
         String title = rs.getString("Name");
-        int cardID = rs.getInt("ID");
-               
+        int cardID = rs.getInt("ID");     
         switch(cardType){
             case Action: 
                 card = CreateActionCard(cardID,cost, title);
@@ -125,8 +126,10 @@ public class DatabaseService {
             default: 
                 throw new NotImplemented();
         }   
-        
         return card;
+        } catch(SQLException e){
+            return null;
+        } 
     }
     
     private dominion.Models.ActionCard CreateActionCard(int cardID,int cost, String title){
@@ -149,14 +152,9 @@ public class DatabaseService {
     	return "SELECT * FROM cards WHERE ID = " + cardID;
     }
     
-    public void close()
-    {
-        try
-        {
-            con.close();
-        }
-        catch(SQLException e)
-        {
+    public void close(){
+        try{con.close();
+        }catch(SQLException e){
         }
     }
 }

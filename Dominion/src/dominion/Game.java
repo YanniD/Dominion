@@ -4,21 +4,34 @@
  * and open the template in the editor.
  */
 package dominion;
-
-//author Quentin
-
-import dominion.Speler;
-
-
+import java.util.ArrayList;
+import dominion.Database.DatabaseService;
+import java.sql.SQLException;
 public class Game {
+    private DatabaseService dbs;
     private Speler speler1;
     private Speler speler2;
+    private ArrayList<dominion.Models.Card> allCards;
+    private Console console;
     
+    public Game(){
+        this.console = new Console(speler1,speler2); 
+        dbs = new DatabaseService();
+        allCards = dbs.FindCards();
+    }
+
+    public Console getConsole(){
+        return console;
+    }
     
-    public Game()
-    {
-        
-    
+    /**
+     * testfunction
+     */
+    public void printAllCards(){
+        for(int i = 0; i < allCards.size(); i++) {
+        dominion.Models.Card cardName = allCards.get(i);
+        System.out.println(cardName.getTitle());
+        }
     }
     
 }

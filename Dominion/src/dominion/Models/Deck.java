@@ -22,9 +22,6 @@ public class Deck {
             ArrayList<Card> starterDeck = makeStarterDeck();
             cards.addAll(starterDeck);
         }
-        else{
-            Arrays.asList();
-        }
     }
     
     public ArrayList<Card> makeStarterDeck() {

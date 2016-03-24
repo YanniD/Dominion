@@ -62,4 +62,25 @@ public class Speler {
     public void coinsDecrement(int coinsDecrease){
         this.coins -= coinsDecrease;
     }
+    
+    public String getPlayerName() {
+        return name;
+    }
+    
+    public int getPlayerID() {
+        return playerID;
+    }
+    
+    public int getActions() {
+        return actions;
+    }
+    
+    public int getBuys() {
+        return buys;
+    }
+    
+    public int getCoins() {
+        return coins;
+    }
+    
 }
