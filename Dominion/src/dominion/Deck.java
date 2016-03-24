@@ -53,10 +53,19 @@ public class Deck {
         return cards.indexOf(c);
     }
     
+    public Card getCardAtIndex(int index){
+        return cards.get(index);
+    }
+    
     private void emptyDeck() {
         for (int i = 0; i < cards.size(); i++) {
             removeCardatIndex(i);
         }
+    }
+    
+    public void moveCardsToOtherDeck(Deck otherDeck){
+        emptyDeck();
+        otherDeck.cards = this.cards;
     }
     
     public void randomShuffle() {
@@ -70,17 +79,10 @@ public class Deck {
         }
     }
     
-    public void CardToOtherDeck(Card c,Deck otherDeck){
-        otherDeck.cards = this.cards;
-    }
-    
-    public Card getCardAtIndex(int index)
-    {
-        return cards.get(index);
-    }
-    
-    public String toString()
-    {
+    /**
+     * testFunction !!mag weg!!
+     */
+    public String toString(){
         return cards.toString();
     }
 }

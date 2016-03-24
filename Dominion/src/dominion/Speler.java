@@ -20,7 +20,7 @@ public class Speler {
     public Speler(String name, int ID){
         this.name = name;
         this.playerID = ID;
-
+        newDecks();
         initRound();
     }
     
@@ -39,29 +39,25 @@ public class Speler {
     //actie verminderen per actiekaart gespeeld
     public void actionDecrement(){
         this.actions -= 1;
-    
     }
     
     //naargelang de kaart actie terug vermeerderen
     public void actionIncrement(int actionIncrease){
         this.actions += actionIncrease;
-    
     }
     
     //na aankoop kaart buy verminderen
     public void buysDecrement(){
         this.buys -= 1;
-    
     }
     
     //na aankoop muntkaarten coins verhogen
     public void coinsIncrement(int coinsIncrease){
         this.coins += coinsIncrease;
-    
     }
     
+    //na aankoop muntkaarten coins verlagen
     public void coinsDecrement(int coinsDecrease){
         this.coins -= coinsDecrease;
-    
     }
 }

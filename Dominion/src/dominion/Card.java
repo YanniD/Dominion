@@ -10,15 +10,6 @@ public class Card {
     private int cardID;
     private int cost;
     private String title;
-    
-    /**
-     * placeholder constructor use other one in final version 
-     */
-    public Card(int cardID){
-        this.cardID = cardID;
-        this.cost = 5;
-        this.title = "Adventurer";       
-    }
 
     public Card(int cardID, int cost, String title){
         this.cardID = cardID;
