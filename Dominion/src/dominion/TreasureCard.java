@@ -10,10 +10,11 @@ package dominion;
 public class TreasureCard extends Card{
     private int worth;
     
-    public TreasureCard(int cost, String title,int worth){
-        super(cost, title);
+    public TreasureCard(int cardID, int cost, String title,int worth){
+        super(cardID, cost, title);
         this.worth = worth;
     }
+    
     public int getWorth(){
         return worth;
     } 

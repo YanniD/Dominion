@@ -9,14 +9,11 @@ package dominion;
 public class VictoryCard extends Card{
     private int victoryPoints;
     
-    public VictoryCard(int cost, String title, int points){
-        super(cost, title);
+    public VictoryCard(int cardID, int cost, String title, int points){
+        super(cardID, cost, title);
         victoryPoints = points;
     }
-    
-    /**
-     * returns victory points
-     */
+
     public int getVP(){
         return victoryPoints;
     }

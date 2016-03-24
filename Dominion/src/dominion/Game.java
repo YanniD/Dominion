@@ -6,71 +6,14 @@
 package dominion;
 
 public class Game {
-    private int acties;
-    private int buys;
+    private Speler speler1;
+    private Speler speler2;
     
     
-    
-    //Constructor
     public Game()
     {
-        acties = 1;
-        buys = 1;
-    }
-    
-    /**
-     * Increment action verhoogt aantal acties
-     */
-    
-    // Actiefase
-    
-    public void incrementAction(int acties)
-    {
-      this.acties += acties;  
-    }
-    
-    public void decrementActions()
-    {
-      acties--;   
-    }
-   
-    public void incrementBuys(int buys)
-    {
-      this.buys += buys;
-    }
-    
-
-    
-    
-    
-    //Aankopen van actiekaarten
-    public void aankoopKaart()
-    {
         
-        
+    
     }
     
-    public void decrementBuys()
-    {
-       buys--;
-    }
-
-    
-    
-    //Einde van de ronde
-    
-   
-    
-    
-    
-    
-    
-    
-    
-    //Einde van het spel
-    public void Endgame()
-    {
-
-    }
-        
 }

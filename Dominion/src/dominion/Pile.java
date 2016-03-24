@@ -8,11 +8,11 @@ package dominion;
 /**
  * Stack are the kingdom-, victoy- and treasurycards
  */
-public class Stack {
+public class Pile {
     private Card card;
     private int amount;
     
-    public Stack(Card givenCard, int totalAmount) {
+    public Pile(Card givenCard, int totalAmount) {
         card = givenCard;
         amount = totalAmount;
     }
