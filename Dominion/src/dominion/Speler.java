@@ -5,6 +5,8 @@
  */
 package dominion;
 
+import dominion.Models.Deck;
+
 public class Speler {
     private String name;
     private int playerID;

@@ -1,39 +1,26 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package dominion;
 
+import dominion.Database.DatabaseService;
+import dominion.Models.Deck;
+import java.sql.Connection;
+import java.sql.SQLException;
+import dominion.Models.*;
 
 public class Dominion {
 
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) {
-        testAanmakenCards();
-        testGetKaartUitTest();
+    public static void main(String[] args) throws ClassNotFoundException, SQLException {
         testAddtoDeck();
         testDeckShuffle(); testDeckShuffle();
+        testDatabase();
     }
     
-    public static void testAanmakenCards()
-    {
-        Card estate = new Card(5, 10 , "test");
-        System.out.println(estate.getTitle());
-    
-    }
-    public static void testGetKaartUitTest()
-    {
-        Set bigMoneySet = new Set();
-        System.out.println(bigMoneySet.getSet(bigMoneySet.getBigMoney(),8));
-    }
-    
-    public static void testAddtoDeck()
+     public static void testAddtoDeck()
     {
         Deck d = new Deck(true);
-        Card c = new Card(5,4,"adventurer");
+        Card c = new Card(11,5,"adventurer",CardType.Action);
         d.addToDeck(0,c);
         System.out.println(d.getCardAtIndex(0));
     }
@@ -43,5 +30,12 @@ public class Dominion {
         Deck d = new Deck(true);
         d.randomShuffle();
         System.out.println(d.toString());
+    }
+   
+    
+    public static void testDatabase() throws SQLException, ClassNotFoundException{
+        DatabaseService dbservice = new DatabaseService();
+    	System.out.println(dbservice.FindCards());
+        System.out.println("blabla");
     }
 }

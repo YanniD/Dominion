@@ -5,6 +5,11 @@
  */
 package dominion;
 
+//author Quentin
+
+import dominion.Speler;
+
+
 public class Game {
     private Speler speler1;
     private Speler speler2;
