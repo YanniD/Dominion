@@ -13,8 +13,8 @@ public class VictoryCard  extends Card{
     
     private int victoryPoints;
     
-    public VictoryCard(int cardID,int cost, String title, CardType cardType,int victoryPoints) {
-        super(cardID,cost, title, cardType);
+    public VictoryCard(int cardID,int cost, String title, CardType cardType,int victoryPoints,int amount) {
+        super(cardID,cost, title, cardType,amount);
         this.victoryPoints = victoryPoints;
     }   
     

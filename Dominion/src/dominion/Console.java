@@ -118,7 +118,7 @@ public class Console {
     public void initGameCards(int chosenSet){
         Set set = new Set();
         cards = set.getGameCards(set.getSet(chosenSet));        
-        ArrayList<Pile> StackOfCards = new ArrayList();
+       // ArrayList<Pile> StackOfCards = new ArrayList();
         
         
     }

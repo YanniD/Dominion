@@ -110,18 +110,19 @@ public class DatabaseService {
         CardType cardType = CardType.values()[rs.getInt("Type")];        
         int cost = rs.getInt("Cost");
         String title = rs.getString("Name");
-        int cardID = rs.getInt("ID");     
+        int cardID = rs.getInt("ID");   
+        int amount = rs.getInt("StartAmount");
         switch(cardType){
             case Action: 
-                card = CreateActionCard(cardID,cost, title);
+                card = CreateActionCard(cardID,cost, title,amount);
                 break;
             case Treasure:
                 int worth = rs.getInt("Worth");
-                card = CreateTreasureCard(cardID,cost,title,worth);
+                card = CreateTreasureCard(cardID,cost,title,worth,amount);
                 break;
             case Victory:
                 int victoryPoints = rs.getInt("VictoryPoints");
-                card = CreateVictoryCard(cardID,cost,title,victoryPoints);
+                card = CreateVictoryCard(cardID,cost,title,victoryPoints,amount);
                 break;    
             default: 
                 throw new NotImplemented();
@@ -132,16 +133,16 @@ public class DatabaseService {
         } 
     }
     
-    private dominion.Models.ActionCard CreateActionCard(int cardID,int cost, String title){
-        return new dominion.Models.ActionCard(cardID, cost, title, CardType.Action);
+    private dominion.Models.ActionCard CreateActionCard(int cardID,int cost, String title,int amount){
+        return new dominion.Models.ActionCard(cardID, cost, title, CardType.Action, amount);
     }
     
-    private dominion.Models.TreasureCard CreateTreasureCard(int cardID, int cost, String title, int worth){
-        return new dominion.Models.TreasureCard (cardID, cost,title,CardType.Treasure,worth);
+    private dominion.Models.TreasureCard CreateTreasureCard(int cardID, int cost, String title, int worth,int amount){
+        return new dominion.Models.TreasureCard (cardID, cost,title,CardType.Treasure,worth,amount);
     }
     
-    private dominion.Models.VictoryCard CreateVictoryCard(int cardID,int cost, String title, int victoryPoints){
-        return new dominion.Models.VictoryCard(cardID,cost,title,CardType.Victory,victoryPoints);        
+    private dominion.Models.VictoryCard CreateVictoryCard(int cardID,int cost, String title, int victoryPoints,int amount){
+        return new dominion.Models.VictoryCard(cardID,cost,title,CardType.Victory,victoryPoints,amount);        
     }
     
     public String BuildGetCardsQuery(){

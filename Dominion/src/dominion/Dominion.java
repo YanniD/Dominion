@@ -52,7 +52,7 @@ public class Dominion{
     
     public static void testGetGameCards(){
         Set s = new Set();
-        ArrayList<Card> gameCards = s.getGameCards(s.getSet(2));
+        ArrayList<Card> gameCards = s.getGameCards(s.getSet(1));
         for (int i = 0; i < gameCards.size(); i++){
             Card c = gameCards.get(i);
             System.out.println(c.getTitle());

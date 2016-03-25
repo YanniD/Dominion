@@ -16,7 +16,7 @@ public class Speler {
     private int actions;
     private int buys;
     private int coins;
-    
+    private int victoryPoints;
     
     //constructor
     public Speler(String name, int ID){
@@ -33,6 +33,7 @@ public class Speler {
     }
     
     private final void initRound(){
+        victoryPoints = 0; // victoryPoints toegevoegd
         actions = 1;
         buys = 1;
         coins = 0;
@@ -53,6 +54,10 @@ public class Speler {
         this.buys -= 1;
     }
     
+    public void buysIncrement(){
+        this.buys +=1;
+    }
+    
     //na aankoop muntkaarten coins verhogen
     public void coinsIncrement(int coinsIncrease){
         this.coins += coinsIncrease;
@@ -61,6 +66,14 @@ public class Speler {
     //na aankoop muntkaarten coins verlagen
     public void coinsDecrement(int coinsDecrease){
         this.coins -= coinsDecrease;
+    }
+    
+    public void victoryPointsIncrement(int amountOfVictoryPoints){
+        this.victoryPoints += victoryPoints;
+    }
+    
+    public void victoryPointsDecrement(int amountOfVictoryPointsLost){
+        this.victoryPoints -= amountOfVictoryPointsLost;
     }
     
     public String getPlayerName() {
@@ -81,5 +94,8 @@ public class Speler {
     
     public int getCoins() {
         return coins;
+    }
+    public int getVictoryPoints(){
+        return victoryPoints;
     }
 }

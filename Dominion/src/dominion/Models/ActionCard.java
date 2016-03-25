@@ -11,8 +11,8 @@ package dominion.Models;
  */
 public class ActionCard extends Card{
     
-    public ActionCard(int cardID,int cost, String title, CardType cardType) {
-        super(cardID,cost, title, cardType);
+    public ActionCard(int cardID,int cost, String title, CardType cardType,int amount) {
+        super(cardID,cost, title, cardType,amount);
     }
     
 }

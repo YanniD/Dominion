@@ -45,7 +45,7 @@ public class Deck {
         cards.add(index, c);
     }
     
-    public void removeCardatIndex(int index){
+    public void removeCardAtIndex(int index){
         cards.remove(index);
     }
     
@@ -59,7 +59,7 @@ public class Deck {
     
     private void emptyDeck() {
         for (int i = 0; i < cards.size(); i++) {
-            removeCardatIndex(i);
+            removeCardAtIndex(i);
         }
     }
     
@@ -70,6 +70,10 @@ public class Deck {
     public void moveCardsToOtherDeck(Deck otherDeck){
         otherDeck.cards = this.cards;
         emptyDeck();
+    }
+    
+    public void moveOneCardToOtherDeck(Deck currentDeck, Deck otherDeck,Card choiceCard){   // 1 kaart wegsturen naar bv naar je discard pile
+         
     }
     
     public void randomShuffle() {

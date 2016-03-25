@@ -15,12 +15,14 @@ public class Card {
     private CardType cardType;    
     private int cost;
     private String title;
+    private int amount;
     
-    public Card(int cardID ,int cost, String title, CardType cardType){
+    public Card(int cardID ,int cost, String title, CardType cardType,int amount){
         this.cardID = cardID;
         this.cost = cost;
         this.title = title;
         this.cardType = cardType;
+        this.amount = amount;
     }
     
     public int getCardID(){

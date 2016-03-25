@@ -12,8 +12,8 @@ package dominion.Models;
 public class TreasureCard extends Card {
     private int worth;
 
-    public TreasureCard(int cardID, int cost, String title, CardType cardType, int worth) {
-        super(cardID ,cost, title, cardType);
+    public TreasureCard(int cardID, int cost, String title, CardType cardType, int worth,int amount) {
+        super(cardID ,cost, title, cardType,amount);
         this.worth = worth;
     }   
     
