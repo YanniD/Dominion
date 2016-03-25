@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 package dominion.Models;
-import dominion.Models.*;
+
 /**
  * piles are the kingdom-, victoy- and treasurycards
  */
@@ -24,4 +24,5 @@ public class Pile {
     public void decrementAmount() {
         amount--;
     }
+    
 }

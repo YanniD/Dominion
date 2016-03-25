@@ -7,26 +7,68 @@ import dominion.Database.DatabaseService;
 import dominion.Models.Card;
 import dominion.Models.CardType;
 import dominion.Models.Deck;
-import java.util.Arrays;
-
+import dominion.Models.Set;
+import java.util.ArrayList;
 public class Dominion{
 
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) throws ClassNotFoundException, SQLException {
-        //testAddtoDeck();
+        //testPrintOneCard();
+        //testAddCardToDeck();
         //testDeckShuffle(); testDeckShuffle();
         //testDatabase();
-        showMenuTest();
-        //testGame();
+        //showMenuTest();
+        //testPrintAllCards();
+        //testGetSetCards();
+        testGetGameCards();
     }
     
-     public static void testAddtoDeck(){
+     public static void testPrintOneCard(){
+        DatabaseService dbs = new DatabaseService();
         Deck d = new Deck(true);
-        Card c = new Card(11,5,"adventurer",CardType.Action);
+        Card c = dbs.FindCardByID(5); //moat
         d.addToDeck(0,c);
-        System.out.println(d.getCardAtIndex(0));
+        String title = c.getTitle();
+        int cost = c.getCost();
+        CardType cardType = c.getType();
+        System.out.println("title cost cardType");
+        System.out.println(title + " " + cost + " " +cardType);
+    }
+     
+    /*
+    public static void testGetSetCards(){
+        DatabaseService dbs = new DatabaseService();
+        Set set = new Set();
+        int[] getYourSet = set.getSet(3);
+        ArrayList<Card> cardSet= set.getCardStats(getYourSet);
+        for (int i = 1; i < set.getLength(getYourSet) ;i++){
+            Card c = dbs.FindCardByID(set.getOneCardOfSet(getYourSet, i));
+            System.out.println(c.getTitle());
+        }
+    }
+    */
+    
+    public static void testGetGameCards(){
+        Set s = new Set();
+        ArrayList<Card> gameCards = s.getGameCards(s.getSet(2));
+        for (int i = 0; i < gameCards.size(); i++){
+            Card c = gameCards.get(i);
+            System.out.println(c.getTitle());
+        }
+    }
+    
+    public static void testAddCardToDeck(){
+        DatabaseService dbs = new DatabaseService();
+        Deck d = new Deck(true);
+        Card c = dbs.FindCardByID(5); //moat
+        d.addToDeck(10, c);
+        d.randomShuffle();
+        for (int i = 0; i < d.getLengthFromDeck(); i++) {
+            Card cardName = d.getCardAtIndex(i);
+            System.out.println(cardName.getTitle());
+        }
     }
     
     public static void testDeckShuffle(){
@@ -45,7 +87,7 @@ public class Dominion{
         System.out.println("Database intact");
     }
     
-    public static void testGame() {
+    public static void testPrintAllCards() {
         Game g = new Game();
         g.printAllCards();
     }

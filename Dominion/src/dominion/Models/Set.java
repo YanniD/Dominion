@@ -4,27 +4,29 @@
  * and open the template in the editor.
  */
 package dominion.Models;
+import dominion.Database.DatabaseService;
+import java.util.ArrayList;
 
 /**
  *
  * @author Yanni
  */
 public class Set {
-    private String[] firstGame;
-    private String[] bigMoney;
-    private String[] interaction;
-    private String[] sizeDistortion;
-    private String[] villageSquare;
+    private int[] firstGame;
+    private int[] bigMoney;
+    private int[] interaction;
+    private int[] sizeDistortion;
+    private int[] villageSquare;
     
     public Set(){
-        firstGame = new String[] {"cellar","market","militia","mine","moat","remodel","smithy","vilage","woodcutter","workshop"};
-        bigMoney = new String[] {"adventurer","bureaucrat","chancellor","chapel","feast","labatory","market","mine","moneylender","throneRoom"};
-        interaction = new String[] {"bureaucrat","chancellor","councilRoom","festival","libary","militia","moat","spy","thief","village"};
-        sizeDistortion = new String[]{"cellar","chapel","feast","gardens","laboratory","thief","village","witch","woodcutter","workshop"};
-        villageSquare = new String[] {"bureaucrat","cellar","festival","libary","market","remodel","smithy","throneRoom","village","woodcutter"};
+        firstGame = new int[] {1,2,3,4,5,6,7,8,9,10};
+        bigMoney = new int[] {11,12,13,14,15,16,2,4,17,18};
+        interaction = new int[] {12,13,31,19,20,3,5,21,22,8};
+        sizeDistortion = new int[]{1,14,15,23,16,22,8,24,9,10};
+        villageSquare = new int[] {12,1,19,20,2,6,7,18,8,9};
     }
     
-    public String[] getSet(int preSetChoice) {
+    public int[] getSet(int preSetChoice) {
         switch(preSetChoice) {
             case 1: return firstGame;
             case 2: return bigMoney;
@@ -36,13 +38,42 @@ public class Set {
         }
     }
     
-    public void showSetCards(String[] Set) {
+    public void showSetCards(int[] Set) {
         for (int i = 0; i < Set.length; i++) {
             System.out.println(getOneCardOfSet(Set,i));
         }
     }
     
-    public String getOneCardOfSet(String[] Set , int i){
+    public int getOneCardOfSet(int[] Set , int i){
             return Set[i];
     }
+    
+    public int getLength(int[] set) {
+        return set.length;
+    }
+    
+    private ArrayList<Card> getCardStats(int[] set){
+        DatabaseService dbs = new DatabaseService();
+        ArrayList<Card> cardStats = new ArrayList<Card>();
+        for (int i = 0; i < set.length; i++) {
+            Card c = dbs.FindCardByID(set[i]);
+            cardStats.add(c);
+        }
+        return cardStats;
+    }
+    
+    private ArrayList<Card> getTRAndVPCards(ArrayList<Card> setCards){   
+        DatabaseService dbs = new DatabaseService();
+         for (int i = 25; i <= 30; i++) {
+             Card c = dbs.FindCardByID(i);
+             setCards.add(c);
+         }
+         return setCards;     
+    }
+    
+    public ArrayList<Card> getGameCards(int[] set) {
+        ArrayList<Card> gameCards = getCardStats(set);
+        return getTRAndVPCards(gameCards);
+    }
+    
 }

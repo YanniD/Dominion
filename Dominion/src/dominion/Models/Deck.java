@@ -6,6 +6,7 @@
 package dominion.Models;
 import java.util.*;
 import dominion.Models.*;
+import dominion.Database.DatabaseService;
 
 /**
  * Decks are the players playing cards
@@ -25,14 +26,15 @@ public class Deck {
     }
     
     public ArrayList<Card> makeStarterDeck() {
+        DatabaseService dbs = new DatabaseService();
         ArrayList<Card> starterDeck = new ArrayList<Card>();
         for (int i = 0; i < 10; i++) {
             if (i < 7){  //int cardID ,int cost, String title, CardType cardType
-                Card tempCopperCard = new Card(1,25,"copper",CardType.Treasure);            //ID temp kaart niet juist
+                Card tempCopperCard = dbs.FindCardByID(25);            //ID temp kaart niet juist
                 starterDeck.add(tempCopperCard);
             }
             else {
-                Card tempEstateCard = new Card(2,28,"estate",CardType.Victory);
+                Card tempEstateCard = dbs.FindCardByID(28);
                 starterDeck.add(tempEstateCard);
             }
         }
@@ -61,9 +63,13 @@ public class Deck {
         }
     }
     
+    public int getLengthFromDeck(){
+        return cards.size();
+    }
+    
     public void moveCardsToOtherDeck(Deck otherDeck){
-        emptyDeck();
         otherDeck.cards = this.cards;
+        emptyDeck();
     }
     
     public void randomShuffle() {

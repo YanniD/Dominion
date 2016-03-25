@@ -7,14 +7,15 @@ package dominion;
 import java.util.ArrayList;
 import dominion.Database.DatabaseService;
 import java.sql.SQLException;
-public class Game {
-    private DatabaseService dbs;
+
+public class Game {;
     private Speler speler1;
     private Speler speler2;
     private ArrayList<dominion.Models.Card> allCards;
     private Console console;
     
     public Game(){
+        DatabaseService dbs = new DatabaseService();
         this.console = new Console(speler1,speler2); 
         dbs = new DatabaseService();
         allCards = dbs.FindCards();

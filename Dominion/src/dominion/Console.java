@@ -6,17 +6,22 @@
 package dominion;
 import java.util.Scanner;
 import dominion.Models.Set;
+;
+import dominion.Database.DatabaseService;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Console {
     private int turn;
     private Speler speler1;
     private Speler speler2;
+    private ArrayList<dominion.Models.Card> cards; 
     
     public Console(Speler speler1, Speler speler2){
         this.turn = 0;
         this.speler1 = new Speler("Speler 1",1);
         this.speler2 = new Speler("Speler 2",2);
+        this.cards = new ArrayList();
     }
     
     public void ShowMenu(){
@@ -37,7 +42,7 @@ public class Console {
         }
         else if(userChoice == 2){
             // function to load game
-            chooseSaveFile();
+            showSaveFiles();
         }
         else if (userChoice == 3){
             // function for exit game
@@ -47,7 +52,7 @@ public class Console {
             throw new IllegalArgumentException("Wrong input");
         }
     }
-    
+   
     public void choosePreSet(){
         showPresets();
         confirmation();
@@ -57,15 +62,20 @@ public class Console {
             confirmation();
             confirmPreSet = scanString();
         }
-        startGame();   
+    }
+    
+    
+    public void startGame() {
+        
     }
 
     public void confirmation() {
         Set set = new Set();
         int choicePreset = scanInt();
-        String[] preSetCards = set.getSet(choicePreset);
+        int[] preSetCards = set.getSet(choicePreset);
         System.out.println(Arrays.toString(preSetCards));
         System.out.println("Do you want to use this preset? y/n ");
+        initGameCards(choicePreset);
     }
 
     public void showPresets(){
@@ -78,14 +88,10 @@ public class Console {
         System.out.println("5: Village Square");
     }
     
-    public void startGame() {
-        System.out.println("Game starting...");
-    }
-    
     /**
      * make dynamic
      */
-    public void chooseSaveFile(){
+    public void showSaveFiles(){
         System.out.println("Choose file to load");
         System.out.println("-------------------\n");
         System.out.println("1: file1");
@@ -109,5 +115,11 @@ public class Console {
    public int getTurn() {
        return turn;
    }
-    
+    public void initGameCards(int chosenSet){
+        Set set = new Set();
+        cards = set.getGameCards(set.getSet(chosenSet));        
+        ArrayList<Pile> StackOfCards = new ArrayList();
+        
+        
+    }
 }

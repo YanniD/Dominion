@@ -82,5 +82,4 @@ public class Speler {
     public int getCoins() {
         return coins;
     }
-    
 }
