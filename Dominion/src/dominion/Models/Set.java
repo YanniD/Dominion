@@ -7,10 +7,7 @@ package dominion.Models;
 import dominion.Database.DatabaseService;
 import java.util.ArrayList;
 
-/**
- *
- * @author Yanni
- */
+
 public class Set {
     private int[] firstGame;
     private int[] bigMoney;
@@ -33,8 +30,7 @@ public class Set {
             case 3: return interaction;        
             case 4: return sizeDistortion;
             case 5: return villageSquare;
-            default: System.out.println("Wrong preset");
-                     return null;
+            default: return null;
         }
     }
     

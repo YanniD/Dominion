@@ -22,7 +22,8 @@ public class Dominion{
         //showMenuTest();
         //testPrintAllCards();
         //testGetSetCards();
-        testGetGameCards();
+        //testGetGameCards();
+        testArraylistAddDel();
     }
     
      public static void testPrintOneCard(){
@@ -37,7 +38,7 @@ public class Dominion{
         System.out.println(title + " " + cost + " " +cardType);
     }
      
-    /*
+/*
     public static void testGetSetCards(){
         DatabaseService dbs = new DatabaseService();
         Set set = new Set();
@@ -48,7 +49,7 @@ public class Dominion{
             System.out.println(c.getTitle());
         }
     }
-    */
+*/
     
     public static void testGetGameCards(){
         Set s = new Set();
@@ -92,7 +93,18 @@ public class Dominion{
         g.printAllCards();
     }
     
-    public static void testCellarAbility(){
+    public static void testArraylistAddDel(){
+        ArrayList<Integer> ints = new ArrayList<Integer>();
+        int intToEnter = 1;
+        for (int i = 0; i < 10; i++) { 
+            ints.add(0, intToEnter);
+            intToEnter++;
+        }
+        System.out.println(ints.toString());
         
+        for (int i = 0; i < 5; i++) { 
+            ints.remove(0);
+        }
+        System.out.println(ints.toString());
     }
 }

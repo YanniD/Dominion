@@ -14,7 +14,7 @@ public class Pile {
     
     public Pile(Card givenCard, int totalAmount) {
         card = givenCard;
-        amount = totalAmount;
+        amount = card.getAmount();
     }
     
     public Card getCard(){
@@ -37,5 +37,7 @@ public class Pile {
     public void decrementAmount() {
         amount--;
     }
+    
+    
     
 }

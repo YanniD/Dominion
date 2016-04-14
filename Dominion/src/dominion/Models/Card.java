@@ -4,8 +4,6 @@
  * and open the template in the editor.
  */
 package dominion.Models;
-import java.util.Arrays;
-
 /**
  *
  * @author Yanni
@@ -35,7 +33,11 @@ public class Card {
         return title;
     }
     public CardType getType(){
-        return this.cardType;
+        return cardType;
     }
+    public int getAmount(){
+        return amount;
+    }
+    
     
 }

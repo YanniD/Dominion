@@ -4,21 +4,21 @@
  * and open the template in the editor.
  */
 package dominion;
-import dominion.Database.DatabaseService;
-import dominion.Models.Card;
-import dominion.Models.CardType;
-import dominion.Models.Deck;
 import dominion.Speler;
 import dominion.Models.*;
+import static dominion.Models.CardType.*;
 import java.util.ArrayList;
 /**
  *
  * @author Yanni
  */
 public class Abilities {
-    public Abilities(){
-        
+    private Speler speler;
+
+    public Abilities(Speler speler){
+        this.speler = speler;
     }
+    
     public void drawAmountOfCards(Speler speler, int amount){
         Deck handDeck = speler.getHandDeck();
         Deck drawDeck = speler.getDrawDeck();
@@ -26,7 +26,7 @@ public class Abilities {
         drawDeck.moveAmountOfCardsToOtherDeck(amount, handDeck);
     }
     
-    public void checkAmountCardsInDrawDeck(Speler speler, int cardsNeeded){
+    private void checkAmountCardsInDrawDeck(Speler speler, int cardsNeeded){
         Deck drawDeck = speler.getDrawDeck();
         Deck discardDeck = speler.getDiscardDeck();
         if (drawDeck.getLengthFromDeck() < cardsNeeded){
@@ -35,11 +35,18 @@ public class Abilities {
         }
     }
     
+    public void gainCardCostingUpTo(Pile chosenPile, int maxCost){
+        Card card = chosenPile.getCard();
+        int cost = card.getCost();
+        if (cost <= maxCost){
+            speler.getHandDeck().addToDeck(0, card);
+            chosenPile.decrementAmount();
+    }
     /**
-     * Use in a while loop in the CLI
-     * if stop action = true then is choice card = null
-     */
-    public void cellarAbility(Speler speler,int timesDiscarded,Card choiceCard, Boolean stopAction){
+      * Use in a while loop in the CLI
+      *if stop action = true then is choice card = null
+      */
+    public void cellarAbility(int timesDiscarded,Card choiceCard, Boolean stopAction){
         Deck handDeck = speler.getHandDeck();
         Deck discardDeck = speler.getDiscardDeck();
         Deck drawDeck = speler.getDrawDeck();
@@ -47,28 +54,28 @@ public class Abilities {
             handDeck.moveOneCardToOtherDeck(discardDeck,choiceCard);
             timesDiscarded +=1;
         }
-        else{
+        else {
            speler.actionIncrement(1);
            checkAmountCardsInDrawDeck(speler, timesDiscarded);
            drawDeck.moveAmountOfCardsToOtherDeck(timesDiscarded, handDeck);
         }     
     }
     
-    public void MarketAbility(Speler speler,Card nieuweKaart){
+    public void marketAbility(Card nieuweKaart){
         speler.actionIncrement(1);
         speler.buysIncrement(1); 
         speler.coinsIncrement(1);
         drawAmountOfCards(speler, 1);
     }
     
-    public void MilitiaAbility(Speler speler1,Speler speler2){
-        speler1.coinsIncrement(2);
-        Deck handDeck = speler2.getHandDeck();
-        Deck discardDeck = speler2.getDiscardDeck();
+    public void militiaAbility(Speler OtherPlayer){
+        speler.coinsIncrement(2);
+        Deck handDeck = OtherPlayer.getHandDeck();
+        Deck discardDeck = OtherPlayer.getDiscardDeck();
         handDeck.moveAmountOfCardsToOtherDeck(3, discardDeck);
     }
     
-    public void MineAbility(Speler speler,int indexTreasureCard,Pile orignalTreasurePile, Pile treasurePile){
+    public void mineAbility(int indexTreasureCard,Pile orignalTreasurePile, Pile treasurePile){
         Deck handDeck = speler.getHandDeck();
         if(!treasurePile.isEmpty()){
         handDeck.removeCardAtIndex(indexTreasureCard);
@@ -82,58 +89,185 @@ public class Abilities {
         }
     }
     
-    public void SmithyAbility(Speler speler){
+    /*
+    public void moatAbility(Speler speler){
         drawAmountOfCards(speler, 3);
     }
     
-    public void VillageAbility(Speler speler){
+    public void remodelAbility(Speler speler){
+        drawAmountOfCards(speler, 3);
+    }
+    */
+    
+    public void smithyAbility(){
+        drawAmountOfCards(speler, 3);
+    }
+    
+    public void villageAbility(){
         speler.actionIncrement(2);
         drawAmountOfCards(speler, 1);
     }
     
-    public void WoodercutterAbility(Speler speler){
+    public void woodercutterAbility(){
         speler.buysIncrement(1);
         speler.coinsIncrement(2);
     }
-    public void WorkshopAbility(Speler speler, Pile chosenPile){
+    public void workshopAbility(Pile chosenPile){
         //gains a card costing up to 4 gold
-        Card card = chosenPile.getCard();
-        int cost = card.getCost();
-        if (cost <= 4){
-            speler.getHandDeck().addToDeck(0, card);
-            chosenPile.decrementAmount();
-            // mogelijks if weglaten? en check buiten de functie om te controleren
+        gainCardCostingUpTo(chosenPile, 4);
+        //mogelijks if weglaten? en check buiten de functie om te controleren
+    }
+    
+    
+    public void adventurerAbility(Speler speler){
+        Deck drawDeck = speler.getDrawDeck();
+        Deck handDeck = speler.getHandDeck();
+        Deck discardDeck = speler.getDiscardDeck();
+        int amountTScards = 0;
+        while (amountTScards < 2) {
+            Card card = drawDeck.getCardAtIndex(0);
+            int cardID = card.getCardID();
+            if (cardID == 25 || cardID == 26 || cardID == 27){
+                drawDeck.moveOneCardToOtherDeck(handDeck, card);
+                amountTScards++;
+            } 
+            else {
+                drawDeck.moveOneCardToOtherDeck(discardDeck, card);
+            }
+        }      
+    }
+    
+    public void bureaucratAbility(Speler OtherPlayer, Pile silverPile){
+        if (silverPile.getAmount() > 0){
+            speler.getDrawDeck().addToDeck(0, silverPile.getCard());
+            silverPile.decrementAmount();
+        } 
+        
+        Deck handDeck = OtherPlayer.getHandDeck();
+        for (int i = 0; i < handDeck.getLengthFromDeck(); i++) {
+            Card card = handDeck.getCardAtIndex(i);
+            if (card.getCardID() != 28 && card.getCardID() != 29 && card.getCardID() != 30) {
+                handDeck.moveOneCardToOtherDeck(OtherPlayer.getDrawDeck(), card);
+            } 
+            // else reveal whole handDeck in CLI
         }
     }
     
-    public void ChancellorAbililty(Speler speler,Boolean discardHand){
+    public void chancellorAbililty(Boolean discardHand){
         speler.coinsIncrement(2);
         if(discardHand){
             speler.getHandDeck().moveAllCardsToOtherDeck(speler.getDiscardDeck());
         }
     }
-        
-    public void CopperAbility(Speler speler){
-        speler.coinsIncrement(1);
+    
+    public void chapelAbililty(ArrayList<Card> cards2Trash) {
+        Deck handDeck = speler.getHandDeck();
+        for (int i = 0; i < cards2Trash.size(); i++) {
+            handDeck.removeCardAtIndex(handDeck.getIndexOf(cards2Trash.get(i)));
+        }
     }
     
-    public void SilverAbility(Speler speler){
+    public void feastAbility(Pile chosenPile){
+        Deck handDeck = speler.getHandDeck();
+        Card tmpFeastCard = new Card(15 , 4, "feast", Action, 10);
+        handDeck.removeCardAtIndex(handDeck.getIndexOf(tmpFeastCard));
+        gainCardCostingUpTo(chosenPile, 5);
+    }
+    
+    public void laboratoryAbility() {
+        drawAmountOfCards(speler, 2);
+        speler.actionIncrement(1);
+    }
+        
+    public void moneylenderAbility() {
+        Deck handDeck = speler.getHandDeck();
+        Card tmpCopperCard = new Card(25 , 4, "copper", Treasure, 60);
+        for(int i = 0; i < handDeck.getLengthFromDeck(); i++){
+            if (handDeck.getCardAtIndex(i) == tmpCopperCard){
+                handDeck.removeCardAtIndex(i);
+                speler.coinsIncrement(3);
+            }
+        }
+    }
+    
+    public void throneroomAbility(Card cardToPlayTwice){
+        //switch over alle kaarten en dubbel uitvoeren
+    }
+    
+    public void councilroomAbility(Speler OtherPlayer){
+        drawAmountOfCards(speler, 4);
+        speler.buysIncrement(1);
+        drawAmountOfCards(OtherPlayer, 1);
+    }
+    
+    public void festivalAbility(){
+        speler.actionIncrement(2);
+        speler.buysIncrement(1);
         speler.coinsIncrement(2);
     }
     
-    public void GoldAbility(Speler speler){
+    /**
+     * 
+     */
+    public void libraryAbility(){
+        Deck handDeck = speler.getHandDeck();
+        Deck drawDeck = speler.getDrawDeck();
+        Deck discardDeck = speler.getDiscardDeck();
+        int handDeckSize = handDeck.getLengthFromDeck();
+        while (handDeckSize < 7){
+            for (int i = 0; i < drawDeck.getLengthFromDeck(); i++) {
+                Card card = drawDeck.getCardAtIndex(i);
+                if (card.getType() == Action) {
+                   
+                } 
+                else {
+                    drawDeck.moveOneCardToOtherDeck(handDeck, card);
+                } 
+            }
+        }
+    }
+    
+    /**
+     * libraryAbility part1: return each ActionCard
+     */
+    public ArrayList<Card> GetFirstActionCard(){
+        
+    }
+    
+    /**
+     * libraryAbility part2: player choses to discard or add actionCard to deck
+     */
+    public void discardActionCard(Card actionCard, boolean choiceToDiscard) {
+        Deck drawDeck = speler.getDrawDeck();
+        if (choiceToDiscard) {
+            drawDeck.moveOneCardToOtherDeck(speler.getDiscardDeck(), actionCard);
+        } else {
+            drawDeck.moveOneCardToOtherDeck(speler.getHandDeck(), actionCard);
+        }
+    }
+    
+    
+    public void copperAbility(){
+        speler.coinsIncrement(1);
+    }
+    
+    public void silverAbility(){
+        speler.coinsIncrement(2);
+    }
+    
+    public void goldAbility(){
         speler.coinsIncrement(3);
     }
     
-    public void EstateAbility(Speler speler){
+    public void estateAbility(){
         speler.victoryPointsIncrement(1);
     }
     
-    public void DuchyAbility(Speler speler){
+    public void duchyAbility(){
         speler.victoryPointsIncrement(3);
     }
     
-    public void ProvinceAbilty(Speler speler){
+    public void provinceAbilty(){
         speler.victoryPointsIncrement(6);
     }
        

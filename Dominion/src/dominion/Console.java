@@ -6,8 +6,6 @@
 package dominion;
 import java.util.Scanner;
 import dominion.Models.Set;
-;
-import dominion.Database.DatabaseService;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -119,7 +117,5 @@ public class Console {
         Set set = new Set();
         cards = set.getGameCards(set.getSet(chosenSet));        
        // ArrayList<Pile> StackOfCards = new ArrayList();
-        
-        
     }
 }
