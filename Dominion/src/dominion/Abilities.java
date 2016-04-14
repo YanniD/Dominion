@@ -19,76 +19,100 @@ public class Abilities {
     public Abilities(){
         
     }
-    public void cellarAbility(Speler speler,Deck handDeck , Deck discardDeck){
-       
-        int nrActions = speler.getActions();
-        speler.actionIncrement(nrActions);
-        while(//user not decided to stop)
-        {
-            int timesDiscarded =+1 ;
-            handDeck.moveOneCardToOtherDeck(discardDeck); // moveOneCardToOtherDeck
-        }
-        
-        // Hierna nog discard any number of cards en +1 card trekken per kaart je hebt discarded
-        
+    public void drawAmountOfCards(Speler speler, int amount){
+        Deck handDeck = speler.getHandDeck();
+        Deck drawDeck = speler.getDrawDeck();
+        checkAmountCardsInDrawDeck(speler, amount);
+        drawDeck.moveAmountOfCardsToOtherDeck(amount, handDeck);
     }
-    public void MarketAbility(Speler speler,Deck huidigeDeck,Card nieuweKaarten){
+    
+    public void checkAmountCardsInDrawDeck(Speler speler, int cardsNeeded){
+        Deck drawDeck = speler.getDrawDeck();
+        Deck discardDeck = speler.getDiscardDeck();
+        if (drawDeck.getLengthFromDeck() < cardsNeeded){
+            discardDeck.randomShuffle();
+            discardDeck.moveAllCardsToOtherDeck(drawDeck);
+        }
+    }
+    
+    /**
+     * Use in a while loop in the CLI
+     * if stop action = true then is choice card = null
+     */
+    public void cellarAbility(Speler speler,int timesDiscarded,Card choiceCard, Boolean stopAction){
+        Deck handDeck = speler.getHandDeck();
+        Deck discardDeck = speler.getDiscardDeck();
+        Deck drawDeck = speler.getDrawDeck();
+        if(!stopAction){
+            handDeck.moveOneCardToOtherDeck(discardDeck,choiceCard);
+            timesDiscarded +=1;
+        }
+        else{
+           speler.actionIncrement(1);
+           checkAmountCardsInDrawDeck(speler, timesDiscarded);
+           drawDeck.moveAmountOfCardsToOtherDeck(timesDiscarded, handDeck);
+        }     
+    }
+    
+    public void MarketAbility(Speler speler,Card nieuweKaart){
         speler.actionIncrement(1);
-        speler.buysIncrement();
+        speler.buysIncrement(1); 
         speler.coinsIncrement(1);
-        
-        //trek 1 kaart erbij
-        int index = huidigeDeck.getLengthFromDeck() -1 ;
-        // index voor op het einde toe te voegen
-        huidigeDeck.addToDeck(index,nieuweKaarten);
-        
+        drawAmountOfCards(speler, 1);
     }
-    public void MilitiaAbility(Speler speler1,Speler speler2,Deck huidigeDeck,Deck discardDeck){
+    
+    public void MilitiaAbility(Speler speler1,Speler speler2){
         speler1.coinsIncrement(2);
-        for (int i = 0 ; i <3; i++){
-            huidigeDeck.moveOneCardToOtherDeck(discardDeck); //moveOneCardToOtherDeck moet nog geschreven worden
+        Deck handDeck = speler2.getHandDeck();
+        Deck discardDeck = speler2.getDiscardDeck();
+        handDeck.moveAmountOfCardsToOtherDeck(3, discardDeck);
+    }
+    
+    public void MineAbility(Speler speler,int indexTreasureCard,Pile orignalTreasurePile, Pile treasurePile){
+        Deck handDeck = speler.getHandDeck();
+        if(!treasurePile.isEmpty()){
+        handDeck.removeCardAtIndex(indexTreasureCard);
+        handDeck.addToDeck(0, treasurePile.getCard());
+        treasurePile.decrementAmount();
+        }
+        else{
+            Card treasureCard = handDeck.getCardAtIndex(indexTreasureCard);
+            handDeck.addToDeck(0, treasureCard);
+            orignalTreasurePile.decrementAmount();
         }
     }
-    public void MineAbility(){
-        //trash ability nog niet in de base Deck , moetn og gebeuren
+    
+    public void SmithyAbility(Speler speler){
+        drawAmountOfCards(speler, 3);
     }
-    public Deck SmithyAbility(Deck huidigeDeck,Card nieuweKaarten){
-        /* Moet deze kaart 3 kaarten toevoegen aan je draw deck , dan is het dit , als het moet gebeuren in je handDeck moet deze code aangepast worden aan de nieuwe java class
-        handDeck
-        */
-        int index = huidigeDeck.getLengthFromDeck() -1 ;
-        for (int i = 0 ; i<3 ; i++){
-            huidigeDeck.addToDeck(index,nieuweKaarten );
-        }
-        return huidigeDeck;
-        
-    }
-    public Deck VillageAbility(Speler speler,Deck huidigeDeck,Card nieuweKaart){
+    
+    public void VillageAbility(Speler speler){
         speler.actionIncrement(2);
-        //trek 1 kaart erbij
-        // index voor op het einde toe te voegen (handDeck of Drawdeck???!)
-        //dit is currently voor de drawDeck
-        int index = huidigeDeck.getLengthFromDeck() -1;
-        huidigeDeck.addToDeck(index,nieuweKaart);
-        return huidigeDeck;
-        }
+        drawAmountOfCards(speler, 1);
+    }
     
     public void WoodercutterAbility(Speler speler){
-        // +1 buy en +2 coins
-        speler.buysIncrement();
+        speler.buysIncrement(1);
         speler.coinsIncrement(2);
     }
-    public Deck WorkshopAbility(Deck huidigeDeck, Card gekozenKaart){
+    public void WorkshopAbility(Speler speler, Pile chosenPile){
         //gains a card costing up to 4 gold
-        DatabaseService db = new DatabaseService();
-        int cost = gekozenKaart.getCost();
+        Card card = chosenPile.getCard();
+        int cost = card.getCost();
         if (cost <= 4){
-            int index = huidigeDeck.getLengthFromDeck() -1;
-            huidigeDeck.addToDeck(index, gekozenKaart); 
+            speler.getHandDeck().addToDeck(0, card);
+            chosenPile.decrementAmount();
+            // mogelijks if weglaten? en check buiten de functie om te controleren
         }
-        return huidigeDeck;
     }
     
+    public void ChancellorAbililty(Speler speler,Boolean discardHand){
+        speler.coinsIncrement(2);
+        if(discardHand){
+            speler.getHandDeck().moveAllCardsToOtherDeck(speler.getDiscardDeck());
+        }
+    }
+        
     public void CopperAbility(Speler speler){
         speler.coinsIncrement(1);
     }
@@ -112,10 +136,5 @@ public class Abilities {
     public void ProvinceAbilty(Speler speler){
         speler.victoryPointsIncrement(6);
     }
-    
-    public void ChancellorAbililty(Speler speler, Deck handDeck,Deck discardDeck){
-        speler.coinsIncrement(2);
-        handDeck.moveCardsToOtherDeck(discardDeck);
-    }
-   
+       
 }

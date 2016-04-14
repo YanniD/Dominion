@@ -91,4 +91,8 @@ public class Dominion{
         Game g = new Game();
         g.printAllCards();
     }
+    
+    public static void testCellarAbility(){
+        
+    }
 }

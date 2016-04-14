@@ -5,13 +5,13 @@
  */
 package dominion;
 
-import dominion.Models.Deck;
+import dominion.Models.*;
 
 public class Speler {
     private String name;
     private int playerID;
     private Deck drawDeck;
-    private Deck hand;
+    private Deck handDeck;
     private Deck discardDeck;
     private int actions;
     private int buys;
@@ -28,7 +28,7 @@ public class Speler {
     
     private final void newDecks(){
         drawDeck = new Deck(true);
-        hand = new Deck(false);
+        handDeck = new Deck(false);
         discardDeck = new Deck(false);
     }
     
@@ -54,8 +54,8 @@ public class Speler {
         this.buys -= 1;
     }
     
-    public void buysIncrement(){
-        this.buys +=1;
+    public void buysIncrement(int buysIncrease){
+        this.buys += buysIncrease;
     }
     
     //na aankoop muntkaarten coins verhogen
@@ -97,5 +97,15 @@ public class Speler {
     }
     public int getVictoryPoints(){
         return victoryPoints;
+    }
+    
+    public Deck getHandDeck(){
+        return handDeck;
+    }
+    public Deck getDiscardDeck(){
+        return discardDeck;
+    }
+    public Deck getDrawDeck(){
+        return drawDeck;
     }
 }

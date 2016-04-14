@@ -16,9 +16,22 @@ public class Pile {
         card = givenCard;
         amount = totalAmount;
     }
+    
+    public Card getCard(){
+        return card;
+    }
 
     public int getAmount() {
         return amount;
+    }
+    
+    public Boolean isEmpty(){
+        if (amount == 0){
+            return true;
+        }
+        else{
+            return false;
+        }
     }
     
     public void decrementAmount() {

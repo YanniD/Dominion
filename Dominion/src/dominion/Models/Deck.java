@@ -14,6 +14,7 @@ import dominion.Database.DatabaseService;
 public class Deck {
     private ArrayList<Card> cards;
     
+    
     /**
      * At start of game draw deck is 
      */
@@ -67,13 +68,21 @@ public class Deck {
         return cards.size();
     }
     
-    public void moveCardsToOtherDeck(Deck otherDeck){
+    public void moveAllCardsToOtherDeck(Deck otherDeck){
         otherDeck.cards = this.cards;
         emptyDeck();
     }
     
-    public void moveOneCardToOtherDeck(Deck currentDeck, Deck otherDeck,Card choiceCard){   // 1 kaart wegsturen naar bv naar je discard pile
-         
+    public void moveOneCardToOtherDeck(Deck otherDeck,Card choiceCard){   // 1 kaart wegsturen naar bv naar je discard pile
+         otherDeck.addToDeck(0,choiceCard);
+         removeCardAtIndex(getIndexOf(choiceCard));
+    }
+    
+    public void moveAmountOfCardsToOtherDeck(int amount , Deck otherDeck){
+        while( amount != 0){     
+            moveOneCardToOtherDeck(otherDeck, getCardAtIndex(0));
+            amount -=1;
+        }
     }
     
     public void randomShuffle() {
@@ -86,7 +95,6 @@ public class Deck {
             cards.set(randomSpot,temp2);
         }
     }
-    
     /**
      * testFunction !!mag weg!!
      */
