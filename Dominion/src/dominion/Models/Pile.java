@@ -12,7 +12,7 @@ public class Pile {
     private Card card;
     private int amount;
     
-    public Pile(Card givenCard, int totalAmount) {
+    public Pile(Card givenCard) {
         card = givenCard;
         amount = card.getAmount();
     }
@@ -25,11 +25,10 @@ public class Pile {
         return amount;
     }
     
-    public Boolean isEmpty(){
+    public boolean isEmpty(){
         if (amount == 0){
             return true;
-        }
-        else{
+        } else{
             return false;
         }
     }

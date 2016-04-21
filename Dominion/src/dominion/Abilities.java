@@ -5,21 +5,14 @@
  */
 
 package dominion;
-import dominion.Speler;
 import dominion.Models.*;
 import static dominion.Models.CardType.*;
 import java.util.ArrayList;
-import dominion.Console;
-import java.util.Scanner;
-/**
- *
- * @author Yanni
- */
-public class Abilities {
-    private Speler speler;
 
-    public Abilities(Speler speler){
-        this.speler = speler;
+public class Abilities {
+
+    public Abilities(){
+        //???????
     }
     
     public void drawAmountOfCards(Speler speler, int amount){
@@ -38,7 +31,7 @@ public class Abilities {
         }
     }
     
-    public void gainCardCostingUpTo(Pile chosenPile, int maxCost){
+    public void gainCardCostingUpTo(Speler speler, Pile chosenPile, int maxCost){
         Card card = chosenPile.getCard();
         int cost = card.getCost();
         if (cost <= maxCost){
@@ -51,7 +44,7 @@ public class Abilities {
       * Use in a while loop in the CLI
       *if stop action = true then is choice card = null
       */
-    public void cellarAbility(int timesDiscarded,Card choiceCard, Boolean stopAction){
+    public void cellarAbility(Speler speler, int timesDiscarded,Card choiceCard, Boolean stopAction){
         Deck handDeck = speler.getHandDeck();
         Deck discardDeck = speler.getDiscardDeck();
         Deck drawDeck = speler.getDrawDeck();
@@ -66,21 +59,21 @@ public class Abilities {
         }     
     }
     
-    public void marketAbility(Card nieuweKaart){
+    public void marketAbility(Speler speler, Card nieuweKaart){
         speler.actionIncrement(1);
         speler.buysIncrement(1); 
         speler.coinsIncrement(1);
         drawAmountOfCards(speler, 1);
     }
     
-    public void militiaAbility(Speler OtherPlayer){
+    public void militiaAbility(Speler speler, Speler OtherPlayer){
         speler.coinsIncrement(2);
         Deck handDeck = OtherPlayer.getHandDeck();
         Deck discardDeck = OtherPlayer.getDiscardDeck();
         handDeck.moveAmountOfCardsToOtherDeck(3, discardDeck);
     }
     
-    public void mineAbility(int indexTreasureCard,Pile orignalTreasurePile, Pile treasurePile){
+    public void mineAbility(Speler speler, int indexTreasureCard,Pile orignalTreasurePile, Pile treasurePile){
         Deck handDeck = speler.getHandDeck();
         if(!treasurePile.isEmpty()){
         handDeck.removeCardAtIndex(indexTreasureCard);
@@ -100,33 +93,33 @@ public class Abilities {
     }
     */
     
-    public void remodelAbility(Card cardToTrash){
+    public void remodelAbility(Speler speler, Card cardToTrash){
         Deck handDeck = speler.getHandDeck();
         int cost = cardToTrash.getCost();
         handDeck.removeCardAtIndex(handDeck.getIndexOf(cardToTrash));
-        Console c = new Console(speler);
+        Console c = new Console();
         if(c.remodelConfirmation()){
-            
+            c.showAvaileblePiles();
         }
     }
     
     
-    public void smithyAbility(){
+    public void smithyAbility(Speler speler){
         drawAmountOfCards(speler, 3);
     }
     
-    public void villageAbility(){
+    public void villageAbility(Speler speler){
         speler.actionIncrement(2);
         drawAmountOfCards(speler, 1);
     }
     
-    public void woodercutterAbility(){
+    public void woodercutterAbility(Speler speler){
         speler.buysIncrement(1);
         speler.coinsIncrement(2);
     }
-    public void workshopAbility(Pile chosenPile){
+    public void workshopAbility(Speler speler, Pile chosenPile){
         //gains a card costing up to 4 gold
-        gainCardCostingUpTo(chosenPile, 4);
+        gainCardCostingUpTo(speler, chosenPile, 4);
         //mogelijks if weglaten? en check buiten de functie om te controleren
     }
     
@@ -149,7 +142,7 @@ public class Abilities {
         }      
     }
     
-    public void bureaucratAbility(Speler OtherPlayer, Pile silverPile){
+    public void bureaucratAbility(Speler speler, Speler OtherPlayer, Pile silverPile){
         if (silverPile.getAmount() > 0){
             speler.getDrawDeck().addToDeck(0, silverPile.getCard());
             silverPile.decrementAmount();
@@ -165,33 +158,33 @@ public class Abilities {
         }
     }
     
-    public void chancellorAbililty(Boolean discardHand){
+    public void chancellorAbililty(Speler speler, Boolean discardHand){
         speler.coinsIncrement(2);
         if(discardHand){
             speler.getHandDeck().moveAllCardsToOtherDeck(speler.getDiscardDeck());
         }
     }
     
-    public void chapelAbililty(ArrayList<Card> cards2Trash) {
+    public void chapelAbililty(Speler speler, ArrayList<Card> cards2Trash) {
         Deck handDeck = speler.getHandDeck();
         for (int i = 0; i < cards2Trash.size(); i++) {
             handDeck.removeCardAtIndex(handDeck.getIndexOf(cards2Trash.get(i)));
         }
     }
     
-    public void feastAbility(Pile chosenPile){
+    public void feastAbility(Speler speler, Pile chosenPile){
         Deck handDeck = speler.getHandDeck();
         Card tmpFeastCard = new Card(15 , 4, "feast", Action, 10);
         handDeck.removeCardAtIndex(handDeck.getIndexOf(tmpFeastCard));
-        gainCardCostingUpTo(chosenPile, 5);
+        gainCardCostingUpTo(speler, chosenPile, 5);
     }
     
-    public void laboratoryAbility() {
+    public void laboratoryAbility(Speler speler) {
         drawAmountOfCards(speler, 2);
         speler.actionIncrement(1);
     }
         
-    public void moneylenderAbility() {
+    public void moneylenderAbility(Speler speler) {
         Deck handDeck = speler.getHandDeck();
         Card tmpCopperCard = new Card(25 , 4, "copper", Treasure, 60);
         for(int i = 0; i < handDeck.getLengthFromDeck(); i++){
@@ -206,19 +199,19 @@ public class Abilities {
         //switch over alle kaarten en dubbel uitvoeren
     }
     
-    public void councilroomAbility(Speler OtherPlayer){
+    public void councilroomAbility(Speler speler, Speler OtherPlayer){
         drawAmountOfCards(speler, 4);
         speler.buysIncrement(1);
         drawAmountOfCards(OtherPlayer, 1);
     }
     
-    public void festivalAbility(){
+    public void festivalAbility(Speler speler){
         speler.actionIncrement(2);
         speler.buysIncrement(1);
         speler.coinsIncrement(2);
     }
     
-    public void libraryAbility(){
+    public void libraryAbility(Speler speler){
         Deck handDeck = speler.getHandDeck();
         Deck drawDeck = speler.getDrawDeck();
         Deck discardDeck = speler.getDiscardDeck();
@@ -227,8 +220,8 @@ public class Abilities {
             for (int i = 0; i < drawDeck.getLengthFromDeck(); i++) {
                 Card card = drawDeck.getCardAtIndex(i);
                 if (card.getType() == Action) {
-                    Console c = new Console(speler); 
-                    discardActionCard(card, c.libraryConfirmation());
+                    Console c = new Console(); 
+                    discardActionCard(speler, card, c.libraryConfirmation());
                 } 
                 else {
                     drawDeck.moveOneCardToOtherDeck(handDeck, card);
@@ -242,7 +235,7 @@ public class Abilities {
      * ----------------------
      * player choses to discard or add actionCard to deck
      */
-    public void discardActionCard(Card actionCard, boolean choiceToKeepCard) {
+    public void discardActionCard(Speler speler, Card actionCard, boolean choiceToKeepCard) {
         Deck drawDeck = speler.getDrawDeck();
         if (choiceToKeepCard) {
             drawDeck.moveOneCardToOtherDeck(speler.getHandDeck(), actionCard);
@@ -251,12 +244,12 @@ public class Abilities {
         }
     }
     
-    public void spyAbility(Speler OtherPlayer){
+    public void spyAbility(Speler speler, Speler OtherPlayer){
         Deck drawDeck = speler.getDrawDeck();
         drawDeck.moveOneCardToOtherDeck(speler.getHandDeck(), drawDeck.getCardAtIndex(0));
         speler.actionIncrement(1);
         
-        Console c = new Console(speler);
+        Console c = new Console();
         Card cardSpeler1 = drawDeck.getCardAtIndex(0); 
         c.revealCard(speler, cardSpeler1, 1);
         Card cardSpeler2 = OtherPlayer.getDrawDeck().getCardAtIndex(0); 
@@ -269,8 +262,8 @@ public class Abilities {
         }
     }
     
-    public void thiefAbility(Speler OtherPlayer){
-        Console c = new Console(speler);
+    public void thiefAbility(Speler speler, Speler OtherPlayer){
+        Console c = new Console();
         Deck drawDeckVictim = OtherPlayer.getDrawDeck();
         int amountTRCards = 0;
         for (int i = 0; i < 2; i++) {
@@ -286,36 +279,36 @@ public class Abilities {
         }
     } 
     
-    public void witchAbility(Speler otherPlayer,Card curse){
+    public void witchAbility(Speler speler, Speler otherPlayer,Card curse){
         speler.getDrawDeck().moveAmountOfCardsToOtherDeck(2, speler.getHandDeck());
         otherPlayer.getHandDeck().addToDeck(0, curse);
     }
     
-    public void copperAbility(){
+    public void copperAbility(Speler speler){
         speler.coinsIncrement(1);
     }
     
-    public void silverAbility(){
+    public void silverAbility(Speler speler){
         speler.coinsIncrement(2);
     }
     
-    public void goldAbility(){
+    public void goldAbility(Speler speler){
         speler.coinsIncrement(3);
     }
     
-    public void estateAbility(){
+    public void estateAbility(Speler speler){
         speler.victoryPointsIncrement(1);
     }
     
-    public void duchyAbility(){
+    public void duchyAbility(Speler speler){
         speler.victoryPointsIncrement(3);
     }
     
-    public void provinceAbilty(){
+    public void provinceAbilty(Speler speler){
         speler.victoryPointsIncrement(6);
     }
     
-    public void gardensAblity() {
+    public void gardensAblity(Speler speler) {
         int amountCards = speler.getDrawDeck().getLengthFromDeck();
         speler.victoryPointsIncrement(amountCards / 10);
     }

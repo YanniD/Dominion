@@ -7,18 +7,15 @@ package dominion;
 import java.util.Scanner;
 import dominion.Models.*;
 import java.util.ArrayList;
-import java.util.Arrays;
+import dominion.Database.DatabaseService;
+
 
 public class Console {
-    private int turn;
-    private Speler speler1;
-    private Speler speler2;
-    private ArrayList<dominion.Models.Card> cards; 
+    private ArrayList<Pile> piles; 
+    private DatabaseService dbs;
     
-    public Console(Speler speler1){
-        this.turn = 0;
-        this.speler1 = new Speler("Speler 1",1);
-        this.cards = new ArrayList();
+    public Console(){
+        this.dbs = new DatabaseService();
     }
     
     public void ShowMenu(){
@@ -35,7 +32,9 @@ public class Console {
     public void processChoice(int userChoice) {
         if (userChoice == 1) {
             // function to new game
-            choosePreSet();
+            Speler s1 = initPlayer(1);
+            Speler s2 = initPlayer(2);
+            choosePreSet(s1, s2);
         }
         else if(userChoice == 2){
             // function to load game
@@ -50,28 +49,33 @@ public class Console {
         }
     }
    
-    public void choosePreSet(){
+    public void choosePreSet(Speler s1, Speler s2){
         showPresets();
         int set = processChoicePreSet();
         String confirmPreSet = scanString();
         while ("n".equals(confirmPreSet)) {
             showPresets();
-            processChoicePreSet();
+            set = processChoicePreSet();
             confirmPreSet = scanString();
         }
-        initGameCards(set);
+        initGame(s1, s2, set);
     }
     
     private int processChoicePreSet(){
-        Set set = new Set();
         int choicePreset = scanInt();
-        confirmation(set, choicePreset);
+        while (choicePreset < 1 || 5 < choicePreset) {
+            showPresets();
+            System.out.println("Enter a valid number: ");
+            choicePreset = scanInt();
+        }
+        confirmation(choicePreset, dbs);
         return choicePreset;
     }
 
-    public void confirmation(Set set, int choicePreset) {
+    private void confirmation(int choicePreset, DatabaseService dbs) {
+        Set set = new Set();
         int[] preSetCards = set.getSet(choicePreset);
-        ArrayList<Card> cards = set.getCardStats(preSetCards);
+        ArrayList<Card> cards = set.getCardStats(preSetCards, dbs);
         System.out.println("-----------------------");
         for(int i = 0; i < cards.size(); i++) {   
             System.out.println(cards.get(i).getTitle());
@@ -99,6 +103,14 @@ public class Console {
         System.out.println("2: file2");
     }
     
+    public Speler initPlayer(int spelerID){
+        System.out.println("Player " + spelerID);
+        System.out.println("Name: ");
+        String player1Name = scanString();
+        Speler speler = new Speler(player1Name, spelerID);
+        return speler;
+    } 
+    
     public int scanInt(){
         Scanner scanner = new Scanner(System.in);
         return scanner.nextInt();
@@ -108,19 +120,9 @@ public class Console {
         Scanner scanner = new Scanner(System.in);
         return scanner.nextLine();
     }
-    
-   public void incrementTurn() {
-       turn++;
-   }
    
-   public int getTurn() {
-       return turn;
-   }
-   
-    public void initGameCards(int chosenSet){
-        Set set = new Set();
-        cards = set.getGameCards(set.getSet(chosenSet));        
-       // ArrayList<Pile> StackOfCards = new ArrayList();
+    public void initGame(Speler speler1, Speler speler2, int chosenSet){
+        Game g = new Game(speler1, speler2, chosenSet, dbs);
     }
     
     public boolean libraryConfirmation() {
@@ -183,9 +185,7 @@ public class Console {
         return yesOrNo();
     }
     
-    public void showAllAvaileblePiles(){
-        for{
-            
-        }
+    public void showAvaileblePiles(){
+        
     }
 }

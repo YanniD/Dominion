@@ -48,8 +48,7 @@ public class Set {
         return set.length;
     }
     
-    public ArrayList<Card> getCardStats(int[] set){
-        DatabaseService dbs = new DatabaseService();
+    public ArrayList<Card> getCardStats(int[] set, DatabaseService dbs){
         ArrayList<Card> cardStats = new ArrayList<Card>();
         for (int i = 0; i < set.length; i++) {
             Card c = dbs.FindCardByID(set[i]);
@@ -58,8 +57,7 @@ public class Set {
         return cardStats;
     }
     
-    private ArrayList<Card> getTRAndVPCards(ArrayList<Card> setCards){   
-        DatabaseService dbs = new DatabaseService();
+    private ArrayList<Card> getTRAndVPCards(ArrayList<Card> setCards, DatabaseService dbs){   
          for (int i = 25; i <= 30; i++) {
              Card c = dbs.FindCardByID(i);
              setCards.add(c);
@@ -67,9 +65,9 @@ public class Set {
          return setCards;     
     }
     
-    public ArrayList<Card> getGameCards(int[] set) {
-        ArrayList<Card> gameCards = getCardStats(set);
-        return getTRAndVPCards(gameCards);
+    public ArrayList<Card> getGameCards(int[] set, DatabaseService dbs) {
+        ArrayList<Card> gameCards = getCardStats(set, dbs);
+        return getTRAndVPCards(gameCards,dbs);
     }
     
 }

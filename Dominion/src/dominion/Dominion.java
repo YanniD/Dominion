@@ -1,7 +1,6 @@
 package dominion;
 
 
-import java.sql.Connection;
 import java.sql.SQLException;
 import dominion.Database.DatabaseService;
 import dominion.Models.Card;
@@ -19,10 +18,9 @@ public class Dominion{
         //testAddCardToDeck();
         //testDeckShuffle(); testDeckShuffle();
         //testDatabase();
-        //showMenuTest();
-        //testPrintAllCards();
-        //testGetSetCards();
-        //testGetGameCards();
+        showMenu();
+        //testGetSetCards(1);
+        //testGetGameCards(5);
         //testArraylistAddDel();
         //testRevealCard();
         //spyAbility();
@@ -42,22 +40,23 @@ public class Dominion{
         System.out.println(title + " " + cost + " " +cardType);
     }
      
-/*
-    public static void testGetSetCards(){
+
+    public static void testGetSetCards(int chosenSet){
         DatabaseService dbs = new DatabaseService();
         Set set = new Set();
-        int[] getYourSet = set.getSet(3);
-        ArrayList<Card> cardSet= set.getCardStats(getYourSet);
+        int[] getYourSet = set.getSet(chosenSet);
+        ArrayList<Card> cardSet = set.getCardStats(getYourSet, dbs);
         for (int i = 1; i < set.getLength(getYourSet) ;i++){
             Card c = dbs.FindCardByID(set.getOneCardOfSet(getYourSet, i));
             System.out.println(c.getTitle());
         }
     }
-*/
+
     
-    public static void testGetGameCards(){
+    public static void testGetGameCards(int chosenSet){
+        DatabaseService dbs = new DatabaseService();
         Set s = new Set();
-        ArrayList<Card> gameCards = s.getGameCards(s.getSet(1));
+        ArrayList<Card> gameCards = s.getGameCards(s.getSet(chosenSet), dbs);
         for (int i = 0; i < gameCards.size(); i++){
             Card c = gameCards.get(i);
             System.out.println(c.getTitle());
@@ -81,20 +80,17 @@ public class Dominion{
         d.randomShuffle();
         System.out.println(d.toString());
     }
-    public static void showMenuTest(){
-        Game g = new Game();
-        g.getConsole().ShowMenu();
+    public static void showMenu(){
+        Speler s = new Speler("Rudy", 1);
+        Speler s2 = new Speler("Frank", 2);
+        Console c = new Console();
+        c.ShowMenu();
     }
     
     public static void testDatabase() throws SQLException, ClassNotFoundException{
         DatabaseService dbservice = new DatabaseService();
     	System.out.println(dbservice.FindCards());
         System.out.println("Database intact");
-    }
-    
-    public static void testPrintAllCards() {
-        Game g = new Game();
-        g.printAllCards();
     }
     
     public static void testArraylistAddDel(){
@@ -113,8 +109,8 @@ public class Dominion{
     }
     
     public static void testRevealCard(){
-        Speler s = new Speler("Speler1", 1);
-        Console c = new Console(s);
+        Speler s = new Speler("Rudy", 1);
+        Console c = new Console();
         Card spy = new Card(1, 4, "Spy", CardType.Action, 5);
         c.revealCard(s, spy, 1);
     }
@@ -122,15 +118,17 @@ public class Dominion{
     public static void spyAbility(){
         Speler s = new Speler("Rudy", 1);
         Speler s2 = new Speler("Frank", 2);
-        Abilities ab = new Abilities(s);
-        ab.spyAbility(s2);
+        Console c = new Console();
+        Abilities ab = new Abilities();
+        ab.spyAbility(s, s2);
     }
     
     public static void thiefAbility(){
         Speler s = new Speler("Rudy", 1);
         Speler s2 = new Speler("Frank", 2);
-        Abilities ab = new Abilities(s);
-        ab.thiefAbility(s2);
+        Console c = new Console();
+        Abilities ab = new Abilities();
+        ab.thiefAbility(s, s2);
     }
     public static void math(){
         System.out.println(25/10);
