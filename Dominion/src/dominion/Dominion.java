@@ -23,7 +23,11 @@ public class Dominion{
         //testPrintAllCards();
         //testGetSetCards();
         //testGetGameCards();
-        testArraylistAddDel();
+        //testArraylistAddDel();
+        //testRevealCard();
+        //spyAbility();
+        //thiefAbility();
+        //math();
     }
     
      public static void testPrintOneCard(){
@@ -106,5 +110,29 @@ public class Dominion{
             ints.remove(0);
         }
         System.out.println(ints.toString());
+    }
+    
+    public static void testRevealCard(){
+        Speler s = new Speler("Speler1", 1);
+        Console c = new Console(s);
+        Card spy = new Card(1, 4, "Spy", CardType.Action, 5);
+        c.revealCard(s, spy, 1);
+    }
+    
+    public static void spyAbility(){
+        Speler s = new Speler("Rudy", 1);
+        Speler s2 = new Speler("Frank", 2);
+        Abilities ab = new Abilities(s);
+        ab.spyAbility(s2);
+    }
+    
+    public static void thiefAbility(){
+        Speler s = new Speler("Rudy", 1);
+        Speler s2 = new Speler("Frank", 2);
+        Abilities ab = new Abilities(s);
+        ab.thiefAbility(s2);
+    }
+    public static void math(){
+        System.out.println(25/10);
     }
 }

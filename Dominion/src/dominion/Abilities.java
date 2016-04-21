@@ -3,11 +3,14 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+
 package dominion;
 import dominion.Speler;
 import dominion.Models.*;
 import static dominion.Models.CardType.*;
 import java.util.ArrayList;
+import dominion.Console;
+import java.util.Scanner;
 /**
  *
  * @author Yanni
@@ -41,7 +44,9 @@ public class Abilities {
         if (cost <= maxCost){
             speler.getHandDeck().addToDeck(0, card);
             chosenPile.decrementAmount();
+        }
     }
+        
     /**
       * Use in a while loop in the CLI
       *if stop action = true then is choice card = null
@@ -93,11 +98,18 @@ public class Abilities {
     public void moatAbility(Speler speler){
         drawAmountOfCards(speler, 3);
     }
-    
-    public void remodelAbility(Speler speler){
-        drawAmountOfCards(speler, 3);
-    }
     */
+    
+    public void remodelAbility(Card cardToTrash){
+        Deck handDeck = speler.getHandDeck();
+        int cost = cardToTrash.getCost();
+        handDeck.removeCardAtIndex(handDeck.getIndexOf(cardToTrash));
+        Console c = new Console(speler);
+        if(c.remodelConfirmation()){
+            
+        }
+    }
+    
     
     public void smithyAbility(){
         drawAmountOfCards(speler, 3);
@@ -206,9 +218,6 @@ public class Abilities {
         speler.coinsIncrement(2);
     }
     
-    /**
-     * 
-     */
     public void libraryAbility(){
         Deck handDeck = speler.getHandDeck();
         Deck drawDeck = speler.getDrawDeck();
@@ -218,7 +227,8 @@ public class Abilities {
             for (int i = 0; i < drawDeck.getLengthFromDeck(); i++) {
                 Card card = drawDeck.getCardAtIndex(i);
                 if (card.getType() == Action) {
-                   
+                    Console c = new Console(speler); 
+                    discardActionCard(card, c.libraryConfirmation());
                 } 
                 else {
                     drawDeck.moveOneCardToOtherDeck(handDeck, card);
@@ -228,24 +238,58 @@ public class Abilities {
     }
     
     /**
-     * libraryAbility part1: return each ActionCard
+     * Part of libraryAbility 
+     * ----------------------
+     * player choses to discard or add actionCard to deck
      */
-    public ArrayList<Card> GetFirstActionCard(){
-        
-    }
-    
-    /**
-     * libraryAbility part2: player choses to discard or add actionCard to deck
-     */
-    public void discardActionCard(Card actionCard, boolean choiceToDiscard) {
+    public void discardActionCard(Card actionCard, boolean choiceToKeepCard) {
         Deck drawDeck = speler.getDrawDeck();
-        if (choiceToDiscard) {
-            drawDeck.moveOneCardToOtherDeck(speler.getDiscardDeck(), actionCard);
-        } else {
+        if (choiceToKeepCard) {
             drawDeck.moveOneCardToOtherDeck(speler.getHandDeck(), actionCard);
+        } else {
+            drawDeck.moveOneCardToOtherDeck(speler.getDiscardDeck(), actionCard);
         }
     }
     
+    public void spyAbility(Speler OtherPlayer){
+        Deck drawDeck = speler.getDrawDeck();
+        drawDeck.moveOneCardToOtherDeck(speler.getHandDeck(), drawDeck.getCardAtIndex(0));
+        speler.actionIncrement(1);
+        
+        Console c = new Console(speler);
+        Card cardSpeler1 = drawDeck.getCardAtIndex(0); 
+        c.revealCard(speler, cardSpeler1, 1);
+        Card cardSpeler2 = OtherPlayer.getDrawDeck().getCardAtIndex(0); 
+        c.revealCard(OtherPlayer, cardSpeler2, 1);
+        
+        if (c.spyConfirmation()) {
+            drawDeck.moveOneCardToOtherDeck(speler.getDiscardDeck(), drawDeck.getCardAtIndex(0));
+            Deck drawDeckVictim = OtherPlayer.getDrawDeck();
+            drawDeckVictim.moveOneCardToOtherDeck(OtherPlayer.getDiscardDeck(), drawDeckVictim.getCardAtIndex(0));
+        }
+    }
+    
+    public void thiefAbility(Speler OtherPlayer){
+        Console c = new Console(speler);
+        Deck drawDeckVictim = OtherPlayer.getDrawDeck();
+        int amountTRCards = 0;
+        for (int i = 0; i < 2; i++) {
+            Card card = drawDeckVictim.getCardAtIndex(i);
+            if (card.getType() == CardType.Treasure) {
+                amountTRCards++;
+            }
+            c.revealCard(OtherPlayer, card, i);
+        }
+        int choiceCard = c.thiefCardChoice();
+        if(choiceCard <= 0 &&choiceCard <3) {
+            drawDeckVictim.moveOneCardToOtherDeck(speler.getHandDeck(), drawDeckVictim.getCardAtIndex(choiceCard));
+        }
+    } 
+    
+    public void witchAbility(Speler otherPlayer,Card curse){
+        speler.getDrawDeck().moveAmountOfCardsToOtherDeck(2, speler.getHandDeck());
+        otherPlayer.getHandDeck().addToDeck(0, curse);
+    }
     
     public void copperAbility(){
         speler.coinsIncrement(1);
@@ -269,6 +313,11 @@ public class Abilities {
     
     public void provinceAbilty(){
         speler.victoryPointsIncrement(6);
+    }
+    
+    public void gardensAblity() {
+        int amountCards = speler.getDrawDeck().getLengthFromDeck();
+        speler.victoryPointsIncrement(amountCards / 10);
     }
        
 }

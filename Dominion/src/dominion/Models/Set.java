@@ -48,7 +48,7 @@ public class Set {
         return set.length;
     }
     
-    private ArrayList<Card> getCardStats(int[] set){
+    public ArrayList<Card> getCardStats(int[] set){
         DatabaseService dbs = new DatabaseService();
         ArrayList<Card> cardStats = new ArrayList<Card>();
         for (int i = 0; i < set.length; i++) {

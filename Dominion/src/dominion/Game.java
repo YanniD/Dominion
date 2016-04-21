@@ -15,7 +15,7 @@ public class Game {;
     
     public Game(){
         DatabaseService dbs = new DatabaseService();
-        this.console = new Console(speler1,speler2); 
+        this.console = new Console(speler1); 
         allCards = dbs.FindCards();
     }
 

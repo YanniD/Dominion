@@ -5,7 +5,7 @@
  */
 package dominion;
 import java.util.Scanner;
-import dominion.Models.Set;
+import dominion.Models.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -15,10 +15,9 @@ public class Console {
     private Speler speler2;
     private ArrayList<dominion.Models.Card> cards; 
     
-    public Console(Speler speler1, Speler speler2){
+    public Console(Speler speler1){
         this.turn = 0;
         this.speler1 = new Speler("Speler 1",1);
-        this.speler2 = new Speler("Speler 2",2);
         this.cards = new ArrayList();
     }
     
@@ -53,27 +52,31 @@ public class Console {
    
     public void choosePreSet(){
         showPresets();
-        confirmation();
+        int set = processChoicePreSet();
         String confirmPreSet = scanString();
         while ("n".equals(confirmPreSet)) {
             showPresets();
-            confirmation();
+            processChoicePreSet();
             confirmPreSet = scanString();
         }
+        initGameCards(set);
     }
     
-    
-    public void startGame() {
-        
-    }
-
-    public void confirmation() {
+    private int processChoicePreSet(){
         Set set = new Set();
         int choicePreset = scanInt();
+        confirmation(set, choicePreset);
+        return choicePreset;
+    }
+
+    public void confirmation(Set set, int choicePreset) {
         int[] preSetCards = set.getSet(choicePreset);
-        System.out.println(Arrays.toString(preSetCards));
+        ArrayList<Card> cards = set.getCardStats(preSetCards);
+        System.out.println("-----------------------");
+        for(int i = 0; i < cards.size(); i++) {   
+            System.out.println(cards.get(i).getTitle());
+        }
         System.out.println("Do you want to use this preset? y/n ");
-        initGameCards(choicePreset);
     }
 
     public void showPresets(){
@@ -113,9 +116,76 @@ public class Console {
    public int getTurn() {
        return turn;
    }
+   
     public void initGameCards(int chosenSet){
         Set set = new Set();
         cards = set.getGameCards(set.getSet(chosenSet));        
        // ArrayList<Pile> StackOfCards = new ArrayList();
+    }
+    
+    public boolean libraryConfirmation() {
+        System.out.println("Do you want to keep this card? y/n");
+        return yesOrNo();
+    }
+    
+    /**
+     * y/n scan
+     */
+    private boolean yesOrNo() {
+        String s = scanString();
+        if ("y".equals(s)){
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
+    /**
+     * Used by spyCard and ThiefCard
+     */
+    public void revealCard(Speler speler, Card card, int index){
+        System.out.println(speler.getPlayerName() + ": " + index + ". " + card.getTitle());
+    }
+    
+    /**
+     * Used by spyCard part2
+     */
+    public boolean spyConfirmation() {
+        System.out.println("Do you want to discard all revealed cards? y/n");
+        return yesOrNo();
+    }
+    
+    /**
+     * Used by spyCard part2
+     */
+    
+    public int thiefCardChoice() {
+
+        if(thiefConfirmation()){
+            System.out.println("Which treasure card do you want to steal?");
+            int cardChoice = scanInt();
+            while (cardChoice < 0 || 1 < cardChoice) {
+                System.out.println("Wrong input.");
+                System.out.println("Which treasure card do you want to steal?");
+            }
+            return cardChoice;
+            }
+        return 3;
+    }
+    
+    public boolean thiefConfirmation(){
+        System.out.println("Do you want to steal a card?  y/n");
+        return yesOrNo();
+    }
+    
+    public boolean remodelConfirmation(){
+        System.out.println("Do you want to choose a card?  y/n");
+        return yesOrNo();
+    }
+    
+    public void showAllAvaileblePiles(){
+        for{
+            
+        }
     }
 }
