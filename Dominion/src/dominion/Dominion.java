@@ -20,7 +20,7 @@ public class Dominion{
         //testDatabase();
         //showMenu();
         //testGetSetCards(1);
-        testGetGameCards(3);
+        //testGetGameCards(3);
         //testArraylistAddDel();
         //testRevealCard();
         //spyAbility();
