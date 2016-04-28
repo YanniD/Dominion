@@ -13,6 +13,7 @@ public class Speler {
     private Deck drawDeck;
     private Deck handDeck;
     private Deck discardDeck;
+    private Deck playedDeck;
     private int actions;
     private int buys;
     private int coins;
@@ -108,4 +109,9 @@ public class Speler {
     public Deck getDrawDeck(){
         return drawDeck;
     }
+
+    public Deck getPlayedDeck() {
+        return playedDeck;
+    }
+    
 }

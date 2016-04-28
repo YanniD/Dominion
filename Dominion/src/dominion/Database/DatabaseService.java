@@ -112,6 +112,7 @@ public class DatabaseService {
         String title = rs.getString("Name");
         int cardID = rs.getInt("ID");   
         int amount = rs.getInt("StartAmount");
+        
         switch(cardType){
             case Action: 
                 card = CreateActionCard(cardID,cost, title,amount);
@@ -123,7 +124,7 @@ public class DatabaseService {
             case Victory:
                 int victoryPoints = rs.getInt("VictoryPoints");
                 card = CreateVictoryCard(cardID,cost,title,victoryPoints,amount);
-                break;    
+                break;
             default: 
                 throw new NotImplemented();
         }   

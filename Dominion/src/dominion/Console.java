@@ -11,7 +11,7 @@ import dominion.Database.DatabaseService;
 
 
 public class Console {
-    private ArrayList<Pile> piles; 
+    private Game g;
     private DatabaseService dbs;
     
     public Console(){
@@ -122,7 +122,18 @@ public class Console {
     }
    
     public void initGame(Speler speler1, Speler speler2, int chosenSet){
-        Game g = new Game(speler1, speler2, chosenSet, dbs);
+        g = new Game(speler1, speler2, chosenSet, dbs);
+        
+    }
+    
+    public void throneroomPickCardtoPlayTwice(Speler speler){
+        System.out.println("Pick a card to play twice");
+        Deck handDeck = speler.getHandDeck();
+        for (int i = 0; i < handDeck.getLengthFromDeck(); i++) {
+            Card card = handDeck.getCardAtIndex(i);
+            revealCard(speler, card, i);
+        }
+         choseCard("Pick a card to put back in your drawdeck: ", handDeck.getLengthFromDeck());
     }
     
     public boolean libraryConfirmation() {
@@ -131,19 +142,7 @@ public class Console {
     }
     
     /**
-     * y/n scan
-     */
-    private boolean yesOrNo() {
-        String s = scanString();
-        if ("y".equals(s)){
-            return true;
-        } else {
-            return false;
-        }
-    }
-    
-    /**
-     * Used by spyCard and ThiefCard
+     * Used by spyCard, ThiefCard and BureaucratCard
      */
     public void revealCard(Speler speler, Card card, int index){
         System.out.println(speler.getPlayerName() + ": " + index + ". " + card.getTitle());
@@ -160,17 +159,10 @@ public class Console {
     /**
      * Used by spyCard part2
      */
-    
     public int thiefCardChoice() {
-
         if(thiefConfirmation()){
             System.out.println("Which treasure card do you want to steal?");
-            int cardChoice = scanInt();
-            while (cardChoice < 0 || 1 < cardChoice) {
-                System.out.println("Wrong input.");
-                System.out.println("Which treasure card do you want to steal?");
-            }
-            return cardChoice;
+            return choseCard("Which treasure card do you want to steal?", 1);
             }
         return 3;
     }
@@ -179,13 +171,67 @@ public class Console {
         System.out.println("Do you want to steal a card?  y/n");
         return yesOrNo();
     }
-    
-    public boolean remodelConfirmation(){
-        System.out.println("Do you want to choose a card?  y/n");
-        return yesOrNo();
+
+    public int remodelPickTrashCard(Speler speler) {
+        Deck handDeck = speler.getHandDeck();
+        for (int i = 0; i < handDeck.getLengthFromDeck(); i++) {
+            Card card = handDeck.getCardAtIndex(i);
+            revealCard(speler, card, i);
+        }
+        return choseCard("Pick a card to trash: ", handDeck.getLengthFromDeck());
     }
-    
-    public void showAvaileblePiles(){
         
+    public Card remodelPickGainCard(int cost){
+        int pickedCard = choseCard("Pick a card that costs up to " + (cost + 2) + ": ", g.getPiles().size());
+        while (g.getPiles().get(pickedCard).isEmpty()){
+            System.out.println("There are no more cards left of your chosen card");
+            pickedCard = choseCard("Pick a card that costs up to " + (cost + 2) + ": ", g.getPiles().size());
+        }
+        g.getPiles().get(pickedCard).decrementAmount();
+        return g.getPiles().get(pickedCard).getCard();
     }
+    
+    /**
+     * Otherplayer picks a victory card to put back in his drawdeck
+     */
+    public int bureaucratCardChoice(Speler speler, ArrayList<Card> Vcards){
+        for (int i = 0; i < Vcards.size(); i++) {
+            Card card = Vcards.get(i);
+            revealCard(speler, card, i);
+        }
+        return choseCard("Pick a card to put back in your drawdeck: ", Vcards.size());
+    }
+    
+    private int choseCard(String text, int max) {
+        System.out.println(text);
+        int cardChoice = scanInt();
+        while (cardChoice < 0 || max < cardChoice) {
+            System.out.println("Wrong input.");
+            System.out.println(text);
+            cardChoice = scanInt();
+        }
+        return cardChoice;
+    }
+    
+    /**
+     * y/n scan
+     */
+    private boolean yesOrNo() {
+        String s = scanString();
+        if ("y".equals(s)){
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
+    public void showAvaileblePiles() {
+        ArrayList<Pile> allPiles = g.getPiles();
+        for (int i = 0; i < allPiles.size(); i++) {
+            Pile huidigePile = allPiles.get(i);
+            Card huidigeCard = huidigePile.getCard();
+            System.out.println(i + ": " + huidigeCard.getTitle() + " || Cost: " + huidigeCard.getCost() + " || Amount left: " + huidigePile.getAmount());  
+        } 
+    }
+    
 }

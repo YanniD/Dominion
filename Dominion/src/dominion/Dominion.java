@@ -119,7 +119,7 @@ public class Dominion{
         Speler s = new Speler("Rudy", 1);
         Speler s2 = new Speler("Frank", 2);
         Console c = new Console();
-        Abilities ab = new Abilities();
+        Abilities ab = new Abilities(c);
         ab.spyAbility(s, s2);
     }
     
@@ -127,7 +127,7 @@ public class Dominion{
         Speler s = new Speler("Rudy", 1);
         Speler s2 = new Speler("Frank", 2);
         Console c = new Console();
-        Abilities ab = new Abilities();
+        Abilities ab = new Abilities(c);
         ab.thiefAbility(s, s2);
     }
     public static void math(){

@@ -24,11 +24,9 @@ public class Game {
         this.dbs = dbs;
         allPiles = new ArrayList<Pile>();
         newGame(chosenSet);
-        abs = new Abilities();
-        
+        abs = new Abilities(new Console()); // make ConsoleGame
     }
 
-    
     public void newGame(int chosenSet){
         Set set = new Set();
         ArrayList<Card> playCards = set.getGameCards(set.getSet(chosenSet), dbs);
@@ -37,12 +35,8 @@ public class Game {
             allPiles.add(pileToAdd);
         } 
     }
-    
-    
-    
-    
-    
-    
-    
   
+    public ArrayList<Pile> getPiles() {
+        return allPiles;
+    }
 }

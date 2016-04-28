@@ -10,9 +10,10 @@ import static dominion.Models.CardType.*;
 import java.util.ArrayList;
 
 public class Abilities {
-
-    public Abilities(){
-        //???????
+    private Console c;
+    
+    public Abilities(Console c){
+        this.c = c;
     }
     
     public void drawAmountOfCards(Speler speler, int amount){
@@ -87,20 +88,21 @@ public class Abilities {
         }
     }
     
-    /*
-    public void moatAbility(Speler speler){
-        drawAmountOfCards(speler, 3);
+
+    public void moatAbility(Speler speler,Speler speler2){
+        drawAmountOfCards(speler, 2);
+        // rest of zbility coded in game engine
     }
-    */
+
     
-    public void remodelAbility(Speler speler, Card cardToTrash){
+    public void remodelAbility(Speler speler){
         Deck handDeck = speler.getHandDeck();
+        Card cardToTrash = handDeck.getCardAtIndex(c.remodelPickTrashCard(speler));
         int cost = cardToTrash.getCost();
         handDeck.removeCardAtIndex(handDeck.getIndexOf(cardToTrash));
-        Console c = new Console();
-        if(c.remodelConfirmation()){
-            c.showAvaileblePiles();
-        }
+        c.showAvaileblePiles();
+        Card cardToGain = c.remodelPickGainCard(cost);
+        handDeck.addToDeck(0, cardToGain);
     }
     
     
@@ -117,10 +119,9 @@ public class Abilities {
         speler.buysIncrement(1);
         speler.coinsIncrement(2);
     }
+    
     public void workshopAbility(Speler speler, Pile chosenPile){
-        //gains a card costing up to 4 gold
         gainCardCostingUpTo(speler, chosenPile, 4);
-        //mogelijks if weglaten? en check buiten de functie om te controleren
     }
     
     
@@ -135,8 +136,7 @@ public class Abilities {
             if (cardID == 25 || cardID == 26 || cardID == 27){
                 drawDeck.moveOneCardToOtherDeck(handDeck, card);
                 amountTScards++;
-            } 
-            else {
+            } else {
                 drawDeck.moveOneCardToOtherDeck(discardDeck, card);
             }
         }      
@@ -149,12 +149,24 @@ public class Abilities {
         } 
         
         Deck handDeck = OtherPlayer.getHandDeck();
+        ArrayList<Card> Vcards = new ArrayList<Card>();
         for (int i = 0; i < handDeck.getLengthFromDeck(); i++) {
             Card card = handDeck.getCardAtIndex(i);
-            if (card.getCardID() != 28 && card.getCardID() != 29 && card.getCardID() != 30) {
-                handDeck.moveOneCardToOtherDeck(OtherPlayer.getDrawDeck(), card);
+            if (card.getType() == CardType.Victory) {
+                Vcards.add(card);
             } 
-            // else reveal whole handDeck in CLI
+        }
+        
+        Console c = new Console();
+        if (Vcards.size() > 1){
+            Card chosenVcard = Vcards.get(c.bureaucratCardChoice(OtherPlayer, Vcards));
+            handDeck.moveOneCardToOtherDeck(OtherPlayer.getDrawDeck(), chosenVcard);
+        } else if (Vcards.size() == 1) {
+            handDeck.moveOneCardToOtherDeck(OtherPlayer.getDrawDeck(), Vcards.get(0));
+        } else {
+            for (int i = 0; i < Vcards.size(); i++){
+                c.revealCard(OtherPlayer, handDeck.getCardAtIndex(i), i);
+            }
         }
     }
     
@@ -195,8 +207,9 @@ public class Abilities {
         }
     }
     
-    public void throneroomAbility(Card cardToPlayTwice){
-        //switch over alle kaarten en dubbel uitvoeren
+    public void throneroomAbility(Speler speler){
+        c.throneroomPickCardtoPlayTwice(speler);
+        
     }
     
     public void councilroomAbility(Speler speler, Speler OtherPlayer){
@@ -220,7 +233,6 @@ public class Abilities {
             for (int i = 0; i < drawDeck.getLengthFromDeck(); i++) {
                 Card card = drawDeck.getCardAtIndex(i);
                 if (card.getType() == Action) {
-                    Console c = new Console(); 
                     discardActionCard(speler, card, c.libraryConfirmation());
                 } 
                 else {
@@ -249,7 +261,6 @@ public class Abilities {
         drawDeck.moveOneCardToOtherDeck(speler.getHandDeck(), drawDeck.getCardAtIndex(0));
         speler.actionIncrement(1);
         
-        Console c = new Console();
         Card cardSpeler1 = drawDeck.getCardAtIndex(0); 
         c.revealCard(speler, cardSpeler1, 1);
         Card cardSpeler2 = OtherPlayer.getDrawDeck().getCardAtIndex(0); 
@@ -263,7 +274,6 @@ public class Abilities {
     }
     
     public void thiefAbility(Speler speler, Speler OtherPlayer){
-        Console c = new Console();
         Deck drawDeckVictim = OtherPlayer.getDrawDeck();
         int amountTRCards = 0;
         for (int i = 0; i < 2; i++) {
