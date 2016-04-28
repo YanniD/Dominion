@@ -74,24 +74,21 @@ public class Abilities {
         handDeck.moveAmountOfCardsToOtherDeck(3, discardDeck);
     }
     
-    public void mineAbility(Speler speler, int indexTreasureCard,Pile orignalTreasurePile, Pile treasurePile){
-        Deck handDeck = speler.getHandDeck();
-        if(!treasurePile.isEmpty()){
-        handDeck.removeCardAtIndex(indexTreasureCard);
-        handDeck.addToDeck(0, treasurePile.getCard());
-        treasurePile.decrementAmount();
-        }
-        else{
-            Card treasureCard = handDeck.getCardAtIndex(indexTreasureCard);
-            handDeck.addToDeck(0, treasureCard);
-            orignalTreasurePile.decrementAmount();
-        }
-    }
+//    public void mineAbility(Speler speler){
+//        Deck handDeck = speler.getHandDeck();
+//        c.showHand(speler);
+//        Card trashCard = c.minePickCardToTrash(speler);
+//        while(trashCard.getType() != CardType.Treasure) {
+//            trashCard = c.minePickCardToTrash(speler);
+//        }        
+//        int cost = trashCard.getCost();
+//        Card gainCard = c.minePickCardToGain(speler);
+//    }
     
 
-    public void moatAbility(Speler speler,Speler speler2){
+    public void moatAbility(Speler speler, Speler speler2){
         drawAmountOfCards(speler, 2);
-        // rest of zbility coded in game engine
+        // rest of ability coded in game engine
     }
 
     
@@ -101,7 +98,7 @@ public class Abilities {
         int cost = cardToTrash.getCost();
         handDeck.removeCardAtIndex(handDeck.getIndexOf(cardToTrash));
         c.showAvaileblePiles();
-        Card cardToGain = c.remodelPickGainCard(cost);
+        Card cardToGain = c.remodelPickGainCard(cost).getCard();
         handDeck.addToDeck(0, cardToGain);
     }
     
@@ -120,8 +117,8 @@ public class Abilities {
         speler.coinsIncrement(2);
     }
     
-    public void workshopAbility(Speler speler, Pile chosenPile){
-        gainCardCostingUpTo(speler, chosenPile, 4);
+    public void workshopAbility(Speler speler){
+        gainCardCostingUpTo(speler, c.workshopPickCard(), 4);
     }
     
     
@@ -130,15 +127,15 @@ public class Abilities {
         Deck handDeck = speler.getHandDeck();
         Deck discardDeck = speler.getDiscardDeck();
         int amountTScards = 0;
-        while (amountTScards < 2) {
+        while (amountTScards < 2 && drawDeck.getLengthFromDeck() > 0) {
             Card card = drawDeck.getCardAtIndex(0);
-            int cardID = card.getCardID();
-            if (cardID == 25 || cardID == 26 || cardID == 27){
+            if (card.getType() == CardType.Treasure){
                 drawDeck.moveOneCardToOtherDeck(handDeck, card);
                 amountTScards++;
             } else {
                 drawDeck.moveOneCardToOtherDeck(discardDeck, card);
             }
+            //reveal ts cards
         }      
     }
     
@@ -157,7 +154,6 @@ public class Abilities {
             } 
         }
         
-        Console c = new Console();
         if (Vcards.size() > 1){
             Card chosenVcard = Vcards.get(c.bureaucratCardChoice(OtherPlayer, Vcards));
             handDeck.moveOneCardToOtherDeck(OtherPlayer.getDrawDeck(), chosenVcard);
@@ -170,24 +166,30 @@ public class Abilities {
         }
     }
     
-    public void chancellorAbililty(Speler speler, Boolean discardHand){
+    public void chancellorAbililty(Speler speler){
         speler.coinsIncrement(2);
-        if(discardHand){
+        if(c.chancellorConfirmation()){
             speler.getHandDeck().moveAllCardsToOtherDeck(speler.getDiscardDeck());
         }
     }
     
-    public void chapelAbililty(Speler speler, ArrayList<Card> cards2Trash) {
+    public void chapelAbililty(Speler speler) {
         Deck handDeck = speler.getHandDeck();
-        for (int i = 0; i < cards2Trash.size(); i++) {
-            handDeck.removeCardAtIndex(handDeck.getIndexOf(cards2Trash.get(i)));
+        boolean stop = false;
+        int i = 4;
+        while (!stop && i > 0) {
+            Card card2Trash = c.chapelTrashCard(speler);
+            handDeck.removeCardAtIndex(handDeck.getIndexOf(card2Trash));
+            i--;
         }
     }
     
-    public void feastAbility(Speler speler, Pile chosenPile){
+    public void feastAbility(Speler speler){
         Deck handDeck = speler.getHandDeck();
         Card tmpFeastCard = new Card(15 , 4, "feast", Action, 10);
         handDeck.removeCardAtIndex(handDeck.getIndexOf(tmpFeastCard));
+        c.showAvaileblePiles();
+        Pile chosenPile = c.feastPickCard();
         gainCardCostingUpTo(speler, chosenPile, 5);
     }
     
@@ -208,7 +210,7 @@ public class Abilities {
     }
     
     public void throneroomAbility(Speler speler){
-        c.throneroomPickCardtoPlayTwice(speler);
+        //c.throneroomPickCardtoPlayTwice(speler);
         
     }
     

@@ -117,6 +117,9 @@ public class DatabaseService {
             case Action: 
                 card = CreateActionCard(cardID,cost, title,amount);
                 break;
+            case ActionAttack:
+                card = CreateActionAttackCard(cardID, cost, title, amount);
+                break;
             case Treasure:
                 int worth = rs.getInt("Worth");
                 card = CreateTreasureCard(cardID,cost,title,worth,amount);
@@ -136,6 +139,10 @@ public class DatabaseService {
     
     private dominion.Models.ActionCard CreateActionCard(int cardID,int cost, String title,int amount){
         return new dominion.Models.ActionCard(cardID, cost, title, CardType.Action, amount);
+    }
+    
+     private dominion.Models.ActionCard CreateActionAttackCard(int cardID,int cost, String title,int amount){
+        return new dominion.Models.ActionCard(cardID, cost, title, CardType.ActionAttack, amount);
     }
     
     private dominion.Models.TreasureCard CreateTreasureCard(int cardID, int cost, String title, int worth,int amount){

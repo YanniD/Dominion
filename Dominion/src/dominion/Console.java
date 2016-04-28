@@ -123,17 +123,12 @@ public class Console {
    
     public void initGame(Speler speler1, Speler speler2, int chosenSet){
         g = new Game(speler1, speler2, chosenSet, dbs);
-        
     }
     
-    public void throneroomPickCardtoPlayTwice(Speler speler){
+    public int throneroomPickCardtoPlayTwice(Speler speler){
         System.out.println("Pick a card to play twice");
-        Deck handDeck = speler.getHandDeck();
-        for (int i = 0; i < handDeck.getLengthFromDeck(); i++) {
-            Card card = handDeck.getCardAtIndex(i);
-            revealCard(speler, card, i);
-        }
-         choseCard("Pick a card to put back in your drawdeck: ", handDeck.getLengthFromDeck());
+        showHand(speler);
+        return choseCard("Pick a card to put back in your drawdeck: ", speler.getHandDeck().getLengthFromDeck());
     }
     
     public boolean libraryConfirmation() {
@@ -161,10 +156,10 @@ public class Console {
      */
     public int thiefCardChoice() {
         if(thiefConfirmation()){
-            System.out.println("Which treasure card do you want to steal?");
             return choseCard("Which treasure card do you want to steal?", 1);
-            }
+        } else {
         return 3;
+        }
     }
     
     public boolean thiefConfirmation(){
@@ -173,22 +168,72 @@ public class Console {
     }
 
     public int remodelPickTrashCard(Speler speler) {
-        Deck handDeck = speler.getHandDeck();
-        for (int i = 0; i < handDeck.getLengthFromDeck(); i++) {
-            Card card = handDeck.getCardAtIndex(i);
-            revealCard(speler, card, i);
-        }
-        return choseCard("Pick a card to trash: ", handDeck.getLengthFromDeck());
+        showHand(speler);
+        return choseCard("Pick a card to trash: ", speler.getHandDeck().getLengthFromDeck());
     }
         
-    public Card remodelPickGainCard(int cost){
-        int pickedCard = choseCard("Pick a card that costs up to " + (cost + 2) + ": ", g.getPiles().size());
+    public Pile remodelPickGainCard(int cost){
+        return pickPile("Pick a card that costs up to " + (cost + 2) + ": ");
+    }
+    
+    public Pile feastPickCard(){
+        return pickPile("Pick a card that costs up to 5: ");
+    }
+    
+    public Pile workshopPickCard(){
+        return pickPile("Pick a card that costs up to 4: ");
+    }
+    
+    public Card chapelTrashCard(Speler speler) {
+        int chosenCard = choseCard("Pick a card to trash: ", speler.getHandDeck().getLengthFromDeck());
+        return speler.getHandDeck().getCardAtIndex(chosenCard);
+    }
+    
+//    public Card minePickCardToTrash(Speler speler) {
+//        printTreasureCards();
+//        
+//        return speler.getHandDeck().getCardAtIndex(chosenCard);
+//    }
+//    
+//    public Card minePickCardToGain(Speler speler) {
+//        printTreasureCards();
+//        System.out.println("Pick a card to gain");
+//        int chosenCard = scanInt();
+//        while (chosenCard < 0 ||  < chosenCard) {
+//            System.out.println("Wrong input.");
+//            System.out.println("Pick a card to gain");
+//            chosenCard = scanInt();
+//        }
+//        g.getPiles().get(chosenCard).decrementAmount();
+//        return g.getPiles().get(chosenCard).getCard();
+//    }
+    
+    public void printTreasureCards() {
+        ArrayList<Pile> piles = g.getPiles();
+        for (int i = 0; i < piles.size(); i++) {
+            Card card = piles.get(i).getCard();
+            if (card.getType() == CardType.Treasure) {
+                System.out.println(i + ": " + card.getTitle() + " || Amount left: " + piles.get(i).getAmount());
+            }
+        }
+    }
+    
+    public boolean chancellorConfirmation() {
+        System.out.println("Do you want to put away your hand into your discard deck? y/n");
+        return yesOrNo();
+    }
+    
+    /**
+     * only use by abilities
+     */
+    private Pile pickPile(String text){
+        int pickedCard = choseCard("Pick a card that costs up to 5: ", g.getPiles().size());
         while (g.getPiles().get(pickedCard).isEmpty()){
             System.out.println("There are no more cards left of your chosen card");
-            pickedCard = choseCard("Pick a card that costs up to " + (cost + 2) + ": ", g.getPiles().size());
+            pickedCard = choseCard("Pick a card that costs up to 5: ", g.getPiles().size());
         }
         g.getPiles().get(pickedCard).decrementAmount();
-        return g.getPiles().get(pickedCard).getCard();
+        return g.getPiles().get(pickedCard);
     }
     
     /**
@@ -202,10 +247,18 @@ public class Console {
         return choseCard("Pick a card to put back in your drawdeck: ", Vcards.size());
     }
     
+    public void showHand(Speler speler){
+        Deck handDeck = speler.getHandDeck();
+        for (int i = 0; i < handDeck.getLengthFromDeck(); i++) {
+            Card card = handDeck.getCardAtIndex(i);
+            revealCard(speler, card, i);
+        }
+    }
+    
     private int choseCard(String text, int max) {
         System.out.println(text);
         int cardChoice = scanInt();
-        while (cardChoice < 0 || max < cardChoice) {
+        while (cardChoice < 0 || (max-1) < cardChoice) {
             System.out.println("Wrong input.");
             System.out.println(text);
             cardChoice = scanInt();

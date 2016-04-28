@@ -18,9 +18,9 @@ public class Dominion{
         //testAddCardToDeck();
         //testDeckShuffle(); testDeckShuffle();
         //testDatabase();
-        showMenu();
+        //showMenu();
         //testGetSetCards(1);
-        //testGetGameCards(5);
+        testGetGameCards(3);
         //testArraylistAddDel();
         //testRevealCard();
         //spyAbility();
