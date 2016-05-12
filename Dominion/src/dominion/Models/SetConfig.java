@@ -8,14 +8,14 @@ import dominion.Database.DatabaseService;
 import java.util.ArrayList;
 
 
-public class Set {
+public class SetConfig {
     private int[] firstGame;
     private int[] bigMoney;
     private int[] interaction;
     private int[] sizeDistortion;
     private int[] villageSquare;
     
-    public Set(){
+    public SetConfig(){
         firstGame = new int[] {1,2,3,4,5,6,7,8,9,10};
         bigMoney = new int[] {11,12,13,14,15,16,2,4,17,18};
         interaction = new int[] {12,13,31,19,20,3,5,21,22,8};

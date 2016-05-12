@@ -36,7 +36,4 @@ public class Pile {
     public void decrementAmount() {
         amount--;
     }
-    
-    
-    
 }

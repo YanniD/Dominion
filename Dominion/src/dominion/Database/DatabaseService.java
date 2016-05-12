@@ -162,7 +162,8 @@ public class DatabaseService {
     }
     
     public void close(){
-        try{con.close();
+        try{
+            con.close();
         }catch(SQLException e){
         }
     }

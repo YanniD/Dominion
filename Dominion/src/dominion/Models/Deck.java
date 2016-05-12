@@ -95,6 +95,7 @@ public class Deck {
             cards.set(randomSpot,temp2);
         }
     }
+    
     /**
      * testFunction !!mag weg!!
      */

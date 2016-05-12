@@ -1,13 +1,10 @@
 package dominion;
 
 
-import Abilities.CardAbility;
+//import Abilities.CardAbility;
 import java.sql.SQLException;
 import dominion.Database.DatabaseService;
-import dominion.Models.Card;
-import dominion.Models.CardType;
-import dominion.Models.Deck;
-import dominion.Models.Set;
+import dominion.Models.*;
 import java.util.ArrayList;
 public class Dominion{
 
@@ -19,7 +16,9 @@ public class Dominion{
         //testAddCardToDeck();
         //testDeckShuffle(); testDeckShuffle();
         //testDatabase();
-        showMenu();
+        //startConsoleGame();
+        showGameCards();
+        //showAllPiles();
         //testGetSetCards(1);
         //testGetGameCards(3);
         //testArraylistAddDel();
@@ -41,10 +40,15 @@ public class Dominion{
         System.out.println(title + " " + cost + " " +cardType);
     }
      
+     public static void showGameCards() {
+        ConsoleGame c = new ConsoleGame();
+        c.ShowMenu();
+     }
+     
 
     public static void testGetSetCards(int chosenSet){
         DatabaseService dbs = new DatabaseService();
-        Set set = new Set();
+        SetConfig set = new SetConfig();
         int[] getYourSet = set.getSet(chosenSet);
         ArrayList<Card> cardSet = set.getCardStats(getYourSet, dbs);
         for (int i = 1; i < set.getLength(getYourSet) ;i++){
@@ -56,7 +60,7 @@ public class Dominion{
     
     public static void testGetGameCards(int chosenSet){
         DatabaseService dbs = new DatabaseService();
-        Set s = new Set();
+        SetConfig s = new SetConfig();
         ArrayList<Card> gameCards = s.getGameCards(s.getSet(chosenSet), dbs);
         for (int i = 0; i < gameCards.size(); i++){
             Card c = gameCards.get(i);
@@ -76,15 +80,23 @@ public class Dominion{
         }
     }
     
+    public static void showAllPiles() {
+        ConsoleGame cg = new ConsoleGame();
+        DatabaseService dbs = new DatabaseService();
+        GameEngine ge = new GameEngine(dbs, cg.pickSet(dbs)); 
+        ArrayList<Pile> piles = ge.getPiles();
+        for(int i = 0; i < piles.size(); i++) {
+            System.out.print(i + ". " + piles.get(i).getCard().getTitle() + " || ");
+        }
+    }
+    
     public static void testDeckShuffle(){
         Deck d = new Deck(true);
         d.randomShuffle();
         System.out.println(d.toString());
     }
-    public static void showMenu(){
-        Speler s = new Speler("Rudy", 1);
-        Speler s2 = new Speler("Frank", 2);
-        Console c = new Console();
+    public static void startConsoleGame(){
+        ConsoleGame c = new ConsoleGame();
         c.ShowMenu();
     }
     
@@ -116,21 +128,22 @@ public class Dominion{
         c.revealCard(s, spy, 1);
     }
     
-    public static void spyAbility(){
-        Speler s = new Speler("Rudy", 1);
-        Speler s2 = new Speler("Frank", 2);
-        Console c = new Console();
-        CardAbility ab = new CardAbility(c);
-        ab.spyAbility(s, s2);
-    }
+//    public static void spyAbility(){
+//        Speler s = new Speler("Rudy", 1);
+//        Speler s2 = new Speler("Frank", 2);
+//        Console c = new Console();
+//        CardAbility ab = new CardAbility(c);
+//        ab.spyAbility(s, s2);
+//    }
+//    
+//    public static void thiefAbility(){
+//        Speler s = new Speler("Rudy", 1);
+//        Speler s2 = new Speler("Frank", 2);
+//        Console c = new Console();
+//        CardAbility ab = new CardAbility(c);
+//        ab.thiefAbility(s, s2);
+//    }
     
-    public static void thiefAbility(){
-        Speler s = new Speler("Rudy", 1);
-        Speler s2 = new Speler("Frank", 2);
-        Console c = new Console();
-        CardAbility ab = new CardAbility(c);
-        ab.thiefAbility(s, s2);
-    }
     public static void math(){
         System.out.println(25/10);
     }

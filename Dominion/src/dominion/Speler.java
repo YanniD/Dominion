@@ -79,26 +79,21 @@ public class Speler {
     public String getPlayerName() {
         return name;
     }
-    
     public int getPlayerID() {
         return playerID;
     }
-    
     public int getActions() {
         return actions;
     }
-    
     public int getBuys() {
         return buys;
     }
-    
     public int getCoins() {
         return coins;
     }
     public int getVictoryPoints(){
         return victoryPoints;
     }
-    
     public Deck getHandDeck(){
         return handDeck;
     }
