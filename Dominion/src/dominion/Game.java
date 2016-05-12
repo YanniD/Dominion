@@ -4,6 +4,7 @@
  * and open the template in the editor.
  */
 package dominion;
+import Abilities.CardAbility;
 import java.util.ArrayList;
 import dominion.Models.Set;
 import dominion.Models.Card;
@@ -15,7 +16,7 @@ public class Game {
     private Speler speler1;
     private Speler speler2;
     private ArrayList<Pile> allPiles;
-    private Abilities abs;
+    private CardAbility abs;
     private DatabaseService dbs;
     
     public Game(Speler speler1, Speler speler2, int chosenSet, DatabaseService dbs){
@@ -24,7 +25,7 @@ public class Game {
         this.dbs = dbs;
         allPiles = new ArrayList<Pile>();
         newGame(chosenSet);
-        abs = new Abilities(new Console()); // make ConsoleGame
+        abs = new CardAbility(new Console()); // make ConsoleGame
     }
 
     public void newGame(int chosenSet){

@@ -1,6 +1,7 @@
 package dominion;
 
 
+import Abilities.CardAbility;
 import java.sql.SQLException;
 import dominion.Database.DatabaseService;
 import dominion.Models.Card;
@@ -18,7 +19,7 @@ public class Dominion{
         //testAddCardToDeck();
         //testDeckShuffle(); testDeckShuffle();
         //testDatabase();
-        //showMenu();
+        showMenu();
         //testGetSetCards(1);
         //testGetGameCards(3);
         //testArraylistAddDel();
@@ -119,7 +120,7 @@ public class Dominion{
         Speler s = new Speler("Rudy", 1);
         Speler s2 = new Speler("Frank", 2);
         Console c = new Console();
-        Abilities ab = new Abilities(c);
+        CardAbility ab = new CardAbility(c);
         ab.spyAbility(s, s2);
     }
     
@@ -127,7 +128,7 @@ public class Dominion{
         Speler s = new Speler("Rudy", 1);
         Speler s2 = new Speler("Frank", 2);
         Console c = new Console();
-        Abilities ab = new Abilities(c);
+        CardAbility ab = new CardAbility(c);
         ab.thiefAbility(s, s2);
     }
     public static void math(){

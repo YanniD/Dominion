@@ -4,15 +4,17 @@
  * and open the template in the editor.
  */
 
-package dominion;
+package Abilities;
+import dominion.Console;
 import dominion.Models.*;
+import dominion.Speler;
 import static dominion.Models.CardType.*;
 import java.util.ArrayList;
 
-public class Abilities {
+public class CardAbility {
     private Console c;
     
-    public Abilities(Console c){
+    public CardAbility(Console c){
         this.c = c;
     }
     
@@ -39,6 +41,10 @@ public class Abilities {
             speler.getHandDeck().addToDeck(0, card);
             chosenPile.decrementAmount();
         }
+    }
+    
+    public void actionIncrement(Speler speler, int increaseAmount){
+        speler.actionIncrement(increaseAmount);
     }
         
     /**
