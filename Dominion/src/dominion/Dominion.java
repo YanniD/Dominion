@@ -22,7 +22,6 @@ public class Dominion{
         //testGetSetCards(1);
         //testGetGameCards(3);
         //testArraylistAddDel();
-        //testRevealCard();
         //spyAbility();
         //thiefAbility();
         //math();
@@ -30,9 +29,9 @@ public class Dominion{
     
      public static void testPrintOneCard(){
         DatabaseService dbs = new DatabaseService();
-        Deck d = new Deck(true);
+        Deck d = new Deck(true, dbs);
         Card c = dbs.FindCardByID(5); //moat
-        d.addToDeck(0,c);
+        d.addToDeck(0, c);
         String title = c.getTitle();
         int cost = c.getCost();
         CardType cardType = c.getType();
@@ -42,7 +41,7 @@ public class Dominion{
      
      public static void showGameCards() {
         ConsoleGame c = new ConsoleGame();
-        c.ShowMenu();
+        c.showMenu();
      }
      
 
@@ -70,9 +69,9 @@ public class Dominion{
     
     public static void testAddCardToDeck(){
         DatabaseService dbs = new DatabaseService();
-        Deck d = new Deck(true);
+        Deck d = new Deck(true, dbs);
         Card c = dbs.FindCardByID(5); //moat
-        d.addToDeck(10, c);
+        d.addToDeck(0, c);
         d.randomShuffle();
         for (int i = 0; i < d.getLengthFromDeck(); i++) {
             Card cardName = d.getCardAtIndex(i);
@@ -83,7 +82,8 @@ public class Dominion{
     public static void showAllPiles() {
         ConsoleGame cg = new ConsoleGame();
         DatabaseService dbs = new DatabaseService();
-        GameEngine ge = new GameEngine(dbs, cg.pickSet(dbs)); 
+        GameEngine ge = new GameEngine();
+        ge.initCards(cg.pickSet());
         ArrayList<Pile> piles = ge.getPiles();
         for(int i = 0; i < piles.size(); i++) {
             System.out.print(i + ". " + piles.get(i).getCard().getTitle() + " || ");
@@ -91,13 +91,14 @@ public class Dominion{
     }
     
     public static void testDeckShuffle(){
-        Deck d = new Deck(true);
+        DatabaseService dbs = new DatabaseService();
+        Deck d = new Deck(true, dbs);
         d.randomShuffle();
         System.out.println(d.toString());
     }
     public static void startConsoleGame(){
         ConsoleGame c = new ConsoleGame();
-        c.ShowMenu();
+        c.showMenu();
     }
     
     public static void testDatabase() throws SQLException, ClassNotFoundException{
@@ -121,12 +122,6 @@ public class Dominion{
         System.out.println(ints.toString());
     }
     
-    public static void testRevealCard(){
-        Speler s = new Speler("Rudy", 1);
-        Console c = new Console();
-        Card spy = new Card(1, 4, "Spy", CardType.Action, 5);
-        c.revealCard(s, spy, 1);
-    }
     
 //    public static void spyAbility(){
 //        Speler s = new Speler("Rudy", 1);

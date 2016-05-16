@@ -18,25 +18,24 @@ public class Deck {
     /**
      * At start of game draw deck is 
      */
-    public Deck(boolean isDrawDeck) {
+    public Deck(boolean isDrawDeck, DatabaseService dbs) {
         cards = new ArrayList<Card>();
         if (isDrawDeck) {
-            ArrayList<Card> starterDeck = makeStarterDeck();
+            ArrayList<Card> starterDeck = makeStarterDeck(dbs);
             cards.addAll(starterDeck);
         }
     }
     
-    public ArrayList<Card> makeStarterDeck() {
-        DatabaseService dbs = new DatabaseService();
+    public ArrayList<Card> makeStarterDeck(DatabaseService dbs) {
         ArrayList<Card> starterDeck = new ArrayList<Card>();
         for (int i = 0; i < 10; i++) {
-            if (i < 7){  //int cardID ,int cost, String title, CardType cardType
-                Card tempCopperCard = dbs.FindCardByID(25);            //ID temp kaart niet juist
-                starterDeck.add(tempCopperCard);
+            if (i < 7){
+                Card copperCard = dbs.FindCardByID(25);            //ID temp kaart niet juist
+                starterDeck.add(copperCard);
             }
             else {
-                Card tempEstateCard = dbs.FindCardByID(28);
-                starterDeck.add(tempEstateCard);
+                Card estateCard = dbs.FindCardByID(28);
+                starterDeck.add(estateCard);
             }
         }
         return starterDeck;
@@ -46,7 +45,7 @@ public class Deck {
         cards.add(index, c);
     }
     
-    public void removeCardAtIndex(int index){
+    public void removeCardfromDeck(int index){
         cards.remove(index);
     }
     
@@ -59,9 +58,7 @@ public class Deck {
     }
     
     private void emptyDeck() {
-        for (int i = 0; i < cards.size(); i++) {
-            removeCardAtIndex(i);
-        }
+        cards.clear();
     }
     
     public int getLengthFromDeck(){
@@ -69,19 +66,18 @@ public class Deck {
     }
     
     public void moveAllCardsToOtherDeck(Deck otherDeck){
-        otherDeck.cards = this.cards;
+        otherDeck.cards.addAll(this.cards);
         emptyDeck();
     }
     
     public void moveOneCardToOtherDeck(Deck otherDeck,Card choiceCard){   // 1 kaart wegsturen naar bv naar je discard pile
-         otherDeck.addToDeck(0,choiceCard);
-         removeCardAtIndex(getIndexOf(choiceCard));
+        otherDeck.addToDeck(0, choiceCard);
+        removeCardfromDeck(getIndexOf(choiceCard));
     }
     
     public void moveAmountOfCardsToOtherDeck(int amount , Deck otherDeck){
-        while( amount != 0){     
+        for(int i = 0; i < amount; i++){     
             moveOneCardToOtherDeck(otherDeck, getCardAtIndex(0));
-            amount -=1;
         }
     }
     

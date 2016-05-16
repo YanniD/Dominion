@@ -10,7 +10,6 @@ package dominion.Models;
  * @author Yanni
  */
 public class VictoryCard  extends Card{
-    
     private int victoryPoints;
     
     public VictoryCard(int cardID,int cost, String title, CardType cardType,int victoryPoints,int amount) {

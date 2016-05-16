@@ -9,32 +9,37 @@ import dominion.Models.SetConfig;
 import dominion.Models.Card;
 import dominion.Models.Pile;
 import dominion.Database.DatabaseService;
+import dominion.Models.CardType;
 import dominion.Models.Deck;
+import dominion.Models.TreasureCard;
+import dominion.Models.VictoryCard;
 import java.util.LinkedList;
 
 public class GameEngine {
     private int turn;
+    private ArrayList<Speler> winner; //list for draws
     private int gamePhase;
     private Speler currentSpeler;
-    private ArrayList<Speler> Spelers;
+    private LinkedList<Speler> Spelers;
     private ArrayList<Pile> allPiles;
     private LinkedList<Card> playedCards;
     private DatabaseService dbs;
 
     
     
-    public GameEngine(DatabaseService dbs, int chosenSet){
+    public GameEngine(){
         turn = 0;
-        this.dbs = dbs;
-        initCards(chosenSet);
+        this.dbs = new DatabaseService();
+        playedCards = new LinkedList<>();
+//        initCards(chosenSet);
     }
     
-    public void setPlayers(ArrayList<Speler> Spelers) {
+    public void setPlayers(LinkedList<Speler> Spelers) {
         currentSpeler = Spelers.get(0);
         this.Spelers = Spelers;
     }
 
-    private void initCards(int chosenSet){
+    public void initCards(int chosenSet){
         SetConfig setConf = new SetConfig();
         allPiles = new ArrayList<Pile>();
         ArrayList<Card> playCards = setConf.getGameCards(setConf.getSet(chosenSet), dbs);
@@ -42,7 +47,7 @@ public class GameEngine {
             Pile pileToAdd = new Pile(dbs.FindCardByID(playCards.get(i).getCardID()));
             allPiles.add(pileToAdd);
         }
-        dbs.close();
+//        dbs.close();
     }
     
     /**
@@ -51,6 +56,7 @@ public class GameEngine {
     public boolean finished(){
         int indexProvinceCard = 15;
         if(allPiles.get(indexProvinceCard).isEmpty() || checkKingdomCards()){
+            endGame();
             return true;
         } else {
             return false;
@@ -79,22 +85,55 @@ public class GameEngine {
         Deck handDeck = currentSpeler.getHandDeck();
         Card cardToPlay = handDeck.getCardAtIndex(indexCard);
         playedCards.add(cardToPlay);
-        handDeck.removeCardAtIndex(indexCard);
+        handDeck.removeCardfromDeck(indexCard);
         currentSpeler.actionDecrement();
     }
+    
+    public void buyCard(int indexPile){
+        if (!allPiles.get(indexPile).isEmpty()){
+            Deck handDeck = currentSpeler.getHandDeck();
+            Card cardToBuy = allPiles.get(indexPile).getCard();
+            handDeck.addToDeck(0, cardToBuy);
+            allPiles.get(indexPile).decrementAmount();
+            currentSpeler.buysDecrement();
+        }
+    }
      
-    public void initFirstRound(){
+    public void initTurn(boolean isFirstTurn){
         for(int i = 0 ; i < Spelers.size(); i++){
-            Deck drawDeck = Spelers.get(i).getDrawDeck();
-            drawDeck.randomShuffle();
-            drawDeck.moveAmountOfCardsToOtherDeck(5, Spelers.get(i).getHandDeck());
+            Speler s = Spelers.get(i);
+            s.initRound();
+            Deck drawDeck = s.getDrawDeck();
+            if (isFirstTurn){
+                drawDeck.randomShuffle();
+            }
+            checkDrawDeckSizeOfPlayer(s, 5);
+            drawDeck.moveAmountOfCardsToOtherDeck(5, s.getHandDeck());
         }
     }
     
-    private void nextSpeler(){
-        int currentSpelerIndex = Spelers.indexOf(currentSpeler);
-        int nextSpelerIndex = (currentSpelerIndex + 1) % 2;
-        currentSpeler = Spelers.get(nextSpelerIndex);
+    /**
+     * if drawdeck size of given player is smaller than sizeNeeded 
+     * it will shuffle the player's discarddeck and move all the cards to his drawdeck
+     */
+    public void checkDrawDeckSizeOfPlayer(Speler s, int sizeNeeded){
+        Deck drawDeck = s.getDrawDeck();
+        if (drawDeck.getLengthFromDeck() < sizeNeeded){
+            Deck discardDeck = s.getDiscardDeck();
+            discardDeck.randomShuffle();
+            discardDeck.moveAllCardsToOtherDeck(drawDeck);
+        }
+    }
+    
+    public boolean currentPlayerHasActionCards() {
+        Deck handDeck = currentSpeler.getHandDeck();
+        for(int i = 0; i < handDeck.getLengthFromDeck(); i++) {
+            CardType cardToCheck = handDeck.getCardAtIndex(i).getType();
+            if (cardToCheck == CardType.Action || cardToCheck == CardType.ActionAttack){
+                return true;
+            }
+        }
+        return false;
     }
 
     private void cleanUpPlayedCards() {
@@ -107,9 +146,11 @@ public class GameEngine {
     }
     
     private void cleanUpHands(){
-        Deck handDeck = currentSpeler.getHandDeck();
-        Deck discardDeck = currentSpeler.getDiscardDeck();
-        handDeck.moveAllCardsToOtherDeck(discardDeck);
+        for (int i = 0; i < Spelers.size(); i++){
+            Deck handDeck = Spelers.get(i).getHandDeck();
+            Deck discardDeck = Spelers.get(i).getDiscardDeck();
+            handDeck.moveAllCardsToOtherDeck(discardDeck);
+        }
     }
 
     /**
@@ -130,13 +171,110 @@ public class GameEngine {
      * turn increments and next player becomes currentPlayer
      */
     public void nextPlayer(){
-        nextSpeler();
+        int currentSpelerIndex = Spelers.indexOf(currentSpeler);
+        int nextSpelerIndex = (currentSpelerIndex + 1) % 2;
+        currentSpeler = Spelers.get(nextSpelerIndex);
         cleanUpPlayedCards();
     }
     
     public void nextTurn(){
         cleanUpHands();
         turn++;
+        initTurn(false);
+    }
+    
+    private void currentPlayerUpdateCoins() {
+        int amount = 0;
+        Deck handDeck = currentSpeler.getHandDeck();
+        for(int i = 0; i < handDeck.getLengthFromDeck(); i++){
+            if (handDeck.getCardAtIndex(i) instanceof TreasureCard){
+                TreasureCard card = (TreasureCard) handDeck.getCardAtIndex(i); //CASTING?
+                amount += card.getWorth();
+            }
+        }
+        currentSpeler.coinsIncrement(amount);
+    }
+    
+    public void endGame(){
+        //move all cards from one player to his drawDeck --> count all VPcards + points --> set winner
+        for(int i = 0; i < Spelers.size(); i++){
+            Speler s = Spelers.get(i);
+            Deck allCards = s.getDrawDeck();
+            Deck handDeck = s.getHandDeck();
+            Deck discardDeck = s.getDiscardDeck();
+            handDeck.moveAllCardsToOtherDeck(allCards);
+            discardDeck.moveAllCardsToOtherDeck(allCards);
+            calculateVictoryPoints(s, allCards);
+        }
+        setWinner(searchPlayerHighestVP());
+    }
+    
+    private void calculateVictoryPoints(Speler s, Deck allCards){
+        int Vpoints = 0;
+        for(int i = 0; i < allCards.getLengthFromDeck(); i++){
+            Card c = allCards.getCardAtIndex(i);
+            if(c instanceof VictoryCard){
+                VictoryCard Vcard = (VictoryCard) c; //CASTING?
+                Vpoints += Vcard.getVictoryPoints();
+                System.out.println("Vcard VP: " + Vcard.getVictoryPoints());
+            }
+        }
+        System.out.println("Vpoints: " + Vpoints);
+        s.setVictoryPoints(Vpoints);
+    }
+    
+    private ArrayList<Speler> searchPlayerHighestVP(){
+        ArrayList<Speler> winners = new ArrayList<>();
+        int highestVP = Spelers.get(0).getVictoryPoints();
+        for(int i = 0; i < Spelers.size(); i++){
+            Speler s = Spelers.get(i);
+            if (s.getVictoryPoints() > highestVP){
+                winners.set(0, s);
+            } else if (s.getVictoryPoints() == highestVP){ //if draw
+                winners.add(s);
+            }
+        }
+        return winners;
+    }
+    
+    /**
+     * used by askAction in ConsoleGame
+     */
+    public boolean isActionCard(int index){
+        CardType c = currentSpeler.getHandDeck().getCardAtIndex(index).getType();    
+        if (c == CardType.Action || c == CardType.ActionAttack) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
+    /**
+     * used by askBuy in ConsoleGame
+     */
+    public boolean isPileEmpty(int indexPile) {
+        if(allPiles.get(indexPile).isEmpty()){
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
+    private void setWinner(ArrayList<Speler> s){
+        winner = s;
+    }
+    
+    public int getCurrentPlayerCoins(){
+        currentPlayerUpdateCoins();
+        return currentSpeler.getCoins();
+    }
+    
+    public int getLengthHandDeckOfCurrentPlayer(){
+        return currentSpeler.getHandDeck().getLengthFromDeck();
+    }
+    
+    public Speler getLastSpeler(){
+        return Spelers.getLast();
     }
     
     public Speler getCurrentSpeler(){
@@ -151,11 +289,19 @@ public class GameEngine {
         return gamePhase;
     }
     
-    public ArrayList<Speler> getSpelers(){
+    public LinkedList<Speler> getSpelers(){
         return Spelers;
     }
 
     public ArrayList<Pile> getPiles() {
         return allPiles;
+    }
+
+    public DatabaseService getDbs() {
+        return dbs;
+    }
+
+    public ArrayList<Speler> getWinner() {
+        return winner;
     }
 }

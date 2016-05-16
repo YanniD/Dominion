@@ -5,6 +5,7 @@
  */
 package dominion;
 
+import dominion.Database.DatabaseService;
 import dominion.Models.*;
 
 public class Speler {
@@ -19,21 +20,20 @@ public class Speler {
     private int victoryPoints;
     
     //constructor
-    public Speler(String name, int ID){
+    public Speler(String name, int ID, DatabaseService dbs){
         this.name = name;
         this.playerID = ID;
-        newDecks();
-        initRound();
+        newDecks(dbs);
+//        initRound();
     }
     
-    private final void newDecks(){
-        drawDeck = new Deck(true);
-        handDeck = new Deck(false);
-        discardDeck = new Deck(false);
+    private void newDecks(DatabaseService dbs){
+        drawDeck = new Deck(true, dbs);
+        handDeck = new Deck(false, dbs);
+        discardDeck = new Deck(false, dbs);
     }
     
-    private final void initRound(){
-        victoryPoints = 0; // victoryPoints toegevoegd
+    public void initRound(){
         actions = 1;
         buys = 1;
         coins = 0;
@@ -68,12 +68,8 @@ public class Speler {
         this.coins -= coinsDecrease;
     }
     
-    public void victoryPointsIncrement(int amountOfVictoryPoints){
-        this.victoryPoints += victoryPoints;
-    }
-    
-    public void victoryPointsDecrement(int amountOfVictoryPointsLost){
-        this.victoryPoints -= amountOfVictoryPointsLost;
+    public void setVictoryPoints(int amount){
+        this.victoryPoints = amount;
     }
     
     public String getPlayerName() {

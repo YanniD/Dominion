@@ -10,7 +10,9 @@ import dominion.Models.Card;
 import dominion.Models.Deck;
 import dominion.Models.Pile;
 import dominion.Models.SetConfig;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Scanner;
 
 /**
@@ -24,7 +26,7 @@ public class ConsoleGame {
         
     }
     
-        public void ShowMenu(){
+        public void showMenu(){
         System.out.println("Dominion");
         System.out.println("----------\n");
         System.out.println("1: New Game");
@@ -63,8 +65,8 @@ public class ConsoleGame {
     }
 
     public void initGameEngine(){
-        DatabaseService dbs = new DatabaseService();
-        Engine = new GameEngine(dbs, pickSet(dbs));
+        Engine = new GameEngine();
+        Engine.initCards(pickSet());
         Engine.setPlayers(askPlayers());
     }
 
@@ -100,23 +102,24 @@ public class ConsoleGame {
         System.out.println("2: file2");
     }
     
-    public ArrayList<Speler> askPlayers(){
-        ArrayList<Speler> Spelers = new ArrayList<>();
+    public LinkedList<Speler> askPlayers(){
+        LinkedList<Speler> Spelers = new LinkedList<>();
         for(int i = 0; i < 2; i++){
             Spelers.add(initPlayer(i));
         }
         return Spelers;
     }
     
-    public Speler initPlayer(int spelerID){
+    private Speler initPlayer(int spelerID){
         System.out.println("Player " + spelerID);
         System.out.println("Name: ");
         String playerName = scanString();
-        Speler speler = new Speler(playerName, spelerID);
+        Speler speler = new Speler(playerName, spelerID, Engine.getDbs());
         return speler;
     } 
     
-    public int pickSet(DatabaseService dbs){
+    public int pickSet(){
+        DatabaseService dbs = Engine.getDbs();
         showPresets();
         int set = processChoiceSet(dbs);
         String confirmPreSet = scanString();
@@ -129,19 +132,32 @@ public class ConsoleGame {
     }
     
     public void goLoop(){
-        Engine.initFirstRound();
-        while(!Engine.finished()){
-            showCurrentSituation();
+        Engine.initTurn(true);
+        boolean checkIfFinished = false;
+        while(!checkIfFinished || !Engine.finished()){
+            checkIfFinished = false;
+            showHeading();
             showGameCards();
+            showCurrentSituation();
             showHand();
-            Engine.nextPlayer();
-            Engine.nextTurn();
+            askAction(); // play card --> check ability --> execute
+            askBuy(); // buy card --> check cost and coins --> add to handddeck
+//            System.out.println("drawDecksize: " + Engine.getCurrentSpeler().getDrawDeck().getLengthFromDeck() + " || " + Engine.getCurrentSpeler().getDrawDeck().toString());
+//            System.out.println("handDecksize: " + Engine.getCurrentSpeler().getHandDeck().getLengthFromDeck() + " || " + Engine.getCurrentSpeler().getHandDeck().toString());
+//            System.out.println("discardDecksize: " + Engine.getCurrentSpeler().getDiscardDeck().getLengthFromDeck() + " || " + Engine.getCurrentSpeler().getDiscardDeck().toString());
+            if (Engine.getCurrentSpeler() == Engine.getLastSpeler()) {
+                checkIfFinished = true;
+                Engine.nextTurn(); // moves all handDecks to discardDecks --> everyone draws 5 new cards from drawDeck + next turn
+            }
+            Engine.nextPlayer(); // empties playedCards + next player
         }
+        showEndScreen();
+        promptEnterKey();
+        showMenu();
     }
     
-    public void showCurrentSituation() {
-        Speler currentSpeler = Engine.getCurrentSpeler();
-        System.out.println("------------------------ TURN " + Engine.getTurn() + " Player: " + currentSpeler.getPlayerName() + " ------------------------");
+    public void showHeading() {
+        System.out.println("------------------------ TURN " + Engine.getTurn() + " Player: " + Engine.getCurrentSpeler().getPlayerName() + " ------------------------");
     }
     
     public void showGameCards(){
@@ -155,28 +171,74 @@ public class ConsoleGame {
         }
     }
     
+    public void showCurrentSituation(){
+        Speler currentSpeler = Engine.getCurrentSpeler();
+        System.out.println("\nActions: " + currentSpeler.getActions() + " || Buys : " + currentSpeler.getBuys() + " || Coins: " + Engine.getCurrentPlayerCoins());
+    }
+    
     public void showHand(){
         Deck handDeck = Engine.getCurrentSpeler().getHandDeck();
-        
-        System.out.print("\nHand : ");
+        System.out.print("Hand : ");
         for (int i = 0; i < handDeck.getLengthFromDeck() ; i++){
             Card card = handDeck.getCardAtIndex(i);
             String cardTitle = card.getTitle();
-            System.out.print("\t || " + i + ". " + cardTitle);
+            System.out.print(" || " + i + ". " + cardTitle);
         }
-        System.out.println("\n");
-        
+        System.out.print("\n");
+    }
+   
+    public void askAction(){
+        if (Engine.currentPlayerHasActionCards()) {
+            System.out.println("\nActions left: " + Engine.getCurrentSpeler().getActions() + " || Pick a card to play (Enter -1 to end action phase): ");
+            int PickedCard = scanInt();
+            while(PickedCard < -1 || Engine.getLengthHandDeckOfCurrentPlayer() < PickedCard || (PickedCard == -1) ? false : !Engine.isActionCard(PickedCard)){    
+                if (!Engine.isActionCard(PickedCard)){
+                    System.out.println("Pick a ACTION card to play");
+                } else {
+                    System.out.println("Pick a card to play (give a correct input): ");
+                } 
+                PickedCard = scanInt();
+            }
+            if(PickedCard != -1){
+                Engine.playCard(PickedCard);
+            } else {
+                System.out.println("Ending action phase");
+            }
+        } else {
+            System.out.println("\nNo luck, you have no action cards. Switching to buy phase");
+        }
     }
     
-   
-    public void pickCardToPlay(){
-        System.out.print("Pick a card to play");
+    public void askBuy(){
+        System.out.println("Buys left: " + Engine.getCurrentSpeler().getBuys()+ " || Pick a card to buy (if you have no coins you can have a free copper. Enter -1 to end buy phase): ");
         int PickedCard = scanInt();
-        while(PickedCard <= 0 || Engine.getCurrentSpeler().getHandDeck().getLengthFromDeck() <= PickedCard){          
-            System.out.print("Pick a card to play (give a correct input)");
+        while(PickedCard < -1 || 15 < PickedCard || (PickedCard == -1) ? false : Engine.isPileEmpty(PickedCard)){ //checks for correct input and if chosen pile isn't empty
+            if (PickedCard < -1 || 15 < PickedCard) {
+                System.out.println("Pick a card to buy (give a correct input): ");
+            } else {
+                System.out.println("This pile is empty please pick another card to buy: ");
+            }
             PickedCard = scanInt();
         }
-        Engine.playCard(PickedCard);
+        if (0 <= PickedCard && PickedCard <= 15) {
+            Engine.buyCard(PickedCard);
+        } else {
+            System.out.println("Ending buy phase");
+        }
+    }
+    
+    public void showEndScreen(){
+        System.out.println("\n----------------------Battle End----------------------\n");
+        ArrayList<Speler> winner = Engine.getWinner();
+        if (winner.size() == 1){
+            System.out.println("Player " + winner.get(0).getPlayerName() + " has won the battle!");
+            System.out.println("Victory points: " + winner.get(0).getVictoryPoints());
+        } else {
+            System.out.println("Draw between the following players:\n");
+            for (int i = 0; i < winner.size(); i++) {
+            System.out.println("Player " + winner.get(i).getPlayerName() + " Victory points: " + winner.get(i).getVictoryPoints());
+            }
+        }
     }
     
     public int scanInt(){
@@ -188,4 +250,13 @@ public class ConsoleGame {
         Scanner scanner = new Scanner(System.in);
         return scanner.nextLine();
     }
+    
+    public void promptEnterKey(){
+    System.out.println("Press \"ENTER\" to continue...");
+    try {
+        System.in.read();
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+}
 }
