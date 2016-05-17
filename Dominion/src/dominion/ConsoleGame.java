@@ -12,6 +12,7 @@ import dominion.Models.Pile;
 import dominion.Models.SetConfig;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.InputMismatchException;
 import java.util.LinkedList;
 import java.util.Scanner;
 
@@ -34,6 +35,10 @@ public class ConsoleGame {
         System.out.println("3: Exit Game");
         System.out.println("Enter:");
         int choice = scanInt();
+        while(choice < 1 && 3 < choice){
+            System.out.println("Enter a valid number: ");
+            choice = scanInt();
+        }
         processChoice(choice);
     }
     
@@ -167,7 +172,7 @@ public class ConsoleGame {
             String cardTitle = card.getTitle();
             int cardCost = card.getCost();
             int amountLeft = Piles.get(i).getAmount();
-            System.out.println(i + ". " + cardTitle + " \t || " + " cost: " + cardCost + " \t || cards left: " + amountLeft );
+            System.out.println(i + ". " + cardTitle + " \t\t || " + " cost: " + cardCost + " \t\t || cards left: " + amountLeft );
         }
     }
     
@@ -190,40 +195,39 @@ public class ConsoleGame {
     public void askAction(){
         if (Engine.currentPlayerHasActionCards()) {
             System.out.println("\nActions left: " + Engine.getCurrentSpeler().getActions() + " || Pick a card to play (Enter -1 to end action phase): ");
-            int PickedCard = scanInt();
-            while(PickedCard < -1 || Engine.getLengthHandDeckOfCurrentPlayer() < PickedCard || (PickedCard == -1) ? false : !Engine.isActionCard(PickedCard)){    
-                if (!Engine.isActionCard(PickedCard)){
-                    System.out.println("Pick a ACTION card to play");
+            int pickedCard = scanInt();
+            int maxInput = Engine.getLengthHandDeckOfCurrentPlayer();
+            while((pickedCard < -1 || maxInput < pickedCard) || ((0 <= pickedCard && pickedCard <= maxInput) ? !Engine.isActionCard(pickedCard) : false)){
+                if(pickedCard < -1 || maxInput < pickedCard){
+                    System.out.println("Pick a card to buy (give a correct input): ");
                 } else {
-                    System.out.println("Pick a card to play (give a correct input): ");
-                } 
-                PickedCard = scanInt();
+                    System.out.println("Pick a ACTION card to play");
+                }
+                pickedCard = scanInt();
             }
-            if(PickedCard != -1){
-                Engine.playCard(PickedCard);
+            if(pickedCard == -1){
+                System.out.println("Ending buy phase");
             } else {
-                System.out.println("Ending action phase");
+                Engine.playCard(pickedCard);
             }
-        } else {
-            System.out.println("\nNo luck, you have no action cards. Switching to buy phase");
         }
     }
-    
+
     public void askBuy(){
-        System.out.println("Buys left: " + Engine.getCurrentSpeler().getBuys()+ " || Pick a card to buy (if you have no coins you can have a free copper. Enter -1 to end buy phase): ");
-        int PickedCard = scanInt();
-        while(PickedCard < -1 || 15 < PickedCard || (PickedCard == -1) ? false : Engine.isPileEmpty(PickedCard)){ //checks for correct input and if chosen pile isn't empty
-            if (PickedCard < -1 || 15 < PickedCard) {
+        System.out.println("Buys left: " + Engine.getCurrentSpeler().getBuys()+ " || Coins left: " + Engine.getCurrentPlayerCoins() + " || Pick a card to buy (if you have no coins you can have a free copper. Enter -1 to end buy phase): ");
+        int pickedCard = scanInt();
+        while((pickedCard < -1 || 15 < pickedCard) || ((0 <= pickedCard && pickedCard <= 15) ? Engine.isPileEmpty(pickedCard) : false)){
+            if(pickedCard < -1 || 15 < pickedCard){
                 System.out.println("Pick a card to buy (give a correct input): ");
             } else {
                 System.out.println("This pile is empty please pick another card to buy: ");
             }
-            PickedCard = scanInt();
+            pickedCard = scanInt();
         }
-        if (0 <= PickedCard && PickedCard <= 15) {
-            Engine.buyCard(PickedCard);
-        } else {
+        if(pickedCard == -1){
             System.out.println("Ending buy phase");
+        } else {
+            Engine.buyCard(pickedCard);
         }
     }
     

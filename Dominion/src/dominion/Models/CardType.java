@@ -12,6 +12,6 @@ package dominion.Models;
 public enum CardType {
     Action,
     ActionAttack,
-    Victory,
-    Treasure
+    Treasure,
+    Victory
 }

@@ -18,7 +18,6 @@ import java.util.LinkedList;
 public class GameEngine {
     private int turn;
     private ArrayList<Speler> winner; //list for draws
-    private int gamePhase;
     private Speler currentSpeler;
     private LinkedList<Speler> Spelers;
     private ArrayList<Pile> allPiles;
@@ -92,9 +91,11 @@ public class GameEngine {
     public void buyCard(int indexPile){
         if (!allPiles.get(indexPile).isEmpty()){
             Deck handDeck = currentSpeler.getHandDeck();
-            Card cardToBuy = allPiles.get(indexPile).getCard();
+            Pile chosenPile = allPiles.get(indexPile);
+            Card cardToBuy = chosenPile.getCard();
             handDeck.addToDeck(0, cardToBuy);
             allPiles.get(indexPile).decrementAmount();
+            currentSpeler.coinsDecrement(cardToBuy.getCost());
             currentSpeler.buysDecrement();
         }
     }
@@ -109,6 +110,7 @@ public class GameEngine {
             }
             checkDrawDeckSizeOfPlayer(s, 5);
             drawDeck.moveAmountOfCardsToOtherDeck(5, s.getHandDeck());
+            updateCoinsOfPlayer(s);
         }
     }
     
@@ -152,20 +154,6 @@ public class GameEngine {
             handDeck.moveAllCardsToOtherDeck(discardDeck);
         }
     }
-
-    /**
-     * phase 0: Action
-     * phase 1: Buy
-     * phase 2: Cleanup
-     */
-    public void nextPhase(){
-        int currentPhase = gamePhase;
-        int nextPhase = currentPhase + 1;
-        if(nextPhase == 2){
-            cleanUpPlayedCards();
-        }
-        gamePhase = nextPhase % 3;
-    }
     
     /**
      * turn increments and next player becomes currentPlayer
@@ -181,18 +169,6 @@ public class GameEngine {
         cleanUpHands();
         turn++;
         initTurn(false);
-    }
-    
-    private void currentPlayerUpdateCoins() {
-        int amount = 0;
-        Deck handDeck = currentSpeler.getHandDeck();
-        for(int i = 0; i < handDeck.getLengthFromDeck(); i++){
-            if (handDeck.getCardAtIndex(i) instanceof TreasureCard){
-                TreasureCard card = (TreasureCard) handDeck.getCardAtIndex(i); //CASTING?
-                amount += card.getWorth();
-            }
-        }
-        currentSpeler.coinsIncrement(amount);
     }
     
     public void endGame(){
@@ -216,10 +192,8 @@ public class GameEngine {
             if(c instanceof VictoryCard){
                 VictoryCard Vcard = (VictoryCard) c; //CASTING?
                 Vpoints += Vcard.getVictoryPoints();
-                System.out.println("Vcard VP: " + Vcard.getVictoryPoints());
             }
         }
-        System.out.println("Vpoints: " + Vpoints);
         s.setVictoryPoints(Vpoints);
     }
     
@@ -264,8 +238,20 @@ public class GameEngine {
         winner = s;
     }
     
+    private void updateCoinsOfPlayer(Speler s) {
+        int amount = 0;
+        Deck handDeck = s.getHandDeck();
+        for(int i = 0; i < handDeck.getLengthFromDeck(); i++){
+//            TreasureCard c = (handDeck.getCardAtIndex(i);
+            if (handDeck.getCardAtIndex(i) instanceof TreasureCard){
+                TreasureCard card = (TreasureCard) handDeck.getCardAtIndex(i); //CASTING?
+                amount += card.getWorth();
+            }
+        }
+        s.coinsIncrement(amount);
+    }
+    
     public int getCurrentPlayerCoins(){
-        currentPlayerUpdateCoins();
         return currentSpeler.getCoins();
     }
     
@@ -283,10 +269,6 @@ public class GameEngine {
     
     public int getTurn(){
         return turn;
-    }
-    
-    public int getGamePhase() {
-        return gamePhase;
     }
     
     public LinkedList<Speler> getSpelers(){
