@@ -40,8 +40,8 @@ public class Speler {
     }
     
     //actie verminderen per actiekaart gespeeld
-    public void actionDecrement(){
-        this.actions -= 1;
+    public void actionDecrement(int actionDecrease){
+        this.actions -= actionDecrease;
     }
     
     //naargelang de kaart actie terug vermeerderen
@@ -50,8 +50,8 @@ public class Speler {
     }
     
     //na aankoop kaart buy verminderen
-    public void buysDecrement(){
-        this.buys -= 1;
+    public void buysDecrement(int buysDecrease){
+        this.buys -= buysDecrease;
     }
     
     public void buysIncrement(int buysIncrease){

@@ -9,11 +9,11 @@ import java.util.ArrayList;
 
 
 public class SetConfig {
-    private int[] firstGame;
-    private int[] bigMoney;
-    private int[] interaction;
-    private int[] sizeDistortion;
-    private int[] villageSquare;
+    private final int[] firstGame;
+    private final int[] bigMoney;
+    private final int[] interaction;
+    private final int[] sizeDistortion;
+    private final int[] villageSquare;
     
     public SetConfig(){
         firstGame = new int[] {1,2,3,4,5,6,7,8,9,10};

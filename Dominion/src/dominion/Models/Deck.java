@@ -81,6 +81,14 @@ public class Deck {
         }
     }
     
+    public void moveSpecificCardsToOtherDeck(ArrayList<Card> cardsToMove, Deck otherDeck){
+        for(int i = 0; i < cardsToMove.size(); i++) {
+            Card c = cardsToMove.get(i);
+            otherDeck.addToDeck(0, c);
+            cardsToMove.remove(i);
+        }
+    }
+    
     public void randomShuffle() {
         int max = cards.size();
         for (int i = 0; i < max; i++) {

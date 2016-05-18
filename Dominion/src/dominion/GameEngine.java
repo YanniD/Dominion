@@ -4,6 +4,9 @@
  * and open the template in the editor.
  */
 package dominion;
+import Abilities.Action;
+import Abilities.ActionHandler;
+import Abilities.SpecialAction;
 import java.util.ArrayList;
 import dominion.Models.SetConfig;
 import dominion.Models.Card;
@@ -16,21 +19,25 @@ import dominion.Models.VictoryCard;
 import java.util.LinkedList;
 
 public class GameEngine {
+    private ConsoleGame cli;
+    private ActionHandler actionHandler;
     private int turn;
-    private ArrayList<Speler> winner; //list for draws
+    private ArrayList<Speler> winner; //list makes draws possible
     private Speler currentSpeler;
     private LinkedList<Speler> Spelers;
-    private ArrayList<Pile> allPiles;
     private LinkedList<Card> playedCards;
+    private ArrayList<Pile> allPiles;
     private DatabaseService dbs;
-
-    
     
     public GameEngine(){
         turn = 0;
         this.dbs = new DatabaseService();
         playedCards = new LinkedList<>();
-//        initCards(chosenSet);
+        actionHandler = new ActionHandler(this);
+    }
+    
+    public void setCLIGameEngine(ConsoleGame consoleGame){
+        cli = consoleGame;
     }
     
     public void setPlayers(LinkedList<Speler> Spelers) {
@@ -46,7 +53,6 @@ public class GameEngine {
             Pile pileToAdd = new Pile(dbs.FindCardByID(playCards.get(i).getCardID()));
             allPiles.add(pileToAdd);
         }
-//        dbs.close();
     }
     
     /**
@@ -74,21 +80,37 @@ public class GameEngine {
             i++;
         }
         if(amountPilesEmpty > 3) {
+            
             return true;
         } else {
             return false;
         }
     }
     
+    /**
+     * executes the chosen action card from hand
+     */ 
     public void playCard(int indexCard){
         Deck handDeck = currentSpeler.getHandDeck();
         Card cardToPlay = handDeck.getCardAtIndex(indexCard);
         playedCards.add(cardToPlay);
         handDeck.removeCardfromDeck(indexCard);
-        currentSpeler.actionDecrement();
+        currentSpeler.actionDecrement(1);
+        actionHandler.executeAction(cardToPlay);
     }
     
-    public void buyCard(int indexPile){
+    public void endActionPhase(){
+        currentSpeler.actionDecrement(currentSpeler.getActions());
+    }
+    
+    public void endBuyPhase(){
+        currentSpeler.buysDecrement(currentSpeler.getBuys());
+    }
+    
+    /**
+     * executes the buy of the chosen card
+     */
+    public void initBuy(int indexPile){
         if (!allPiles.get(indexPile).isEmpty()){
             Deck handDeck = currentSpeler.getHandDeck();
             Pile chosenPile = allPiles.get(indexPile);
@@ -96,22 +118,47 @@ public class GameEngine {
             handDeck.addToDeck(0, cardToBuy);
             allPiles.get(indexPile).decrementAmount();
             currentSpeler.coinsDecrement(cardToBuy.getCost());
-            currentSpeler.buysDecrement();
+            currentSpeler.buysDecrement(1);
         }
     }
+    
+    /**
+     * returns true if coins >= cost of card
+     * returns false if not
+     */
+    public boolean isCardBuyable(int indexPile){
+        int coins = currentSpeler.getCoins();
+        int cost = allPiles.get(indexPile).getCard().getCost();
+        if(coins >= cost){
+            return true;
+        }
+        return false;
+    }
      
-    public void initTurn(boolean isFirstTurn){
+    /**
+     * all players draw 5 cards from drawdeck into hand
+     * @param isFirstTurn is true if it's the first turn of the game
+     * else it should be false
+     */
+    public void initFirstTurn(){
         for(int i = 0 ; i < Spelers.size(); i++){
             Speler s = Spelers.get(i);
             s.initRound();
             Deck drawDeck = s.getDrawDeck();
-            if (isFirstTurn){
-                drawDeck.randomShuffle();
-            }
-            checkDrawDeckSizeOfPlayer(s, 5);
+            drawDeck.randomShuffle();
             drawDeck.moveAmountOfCardsToOtherDeck(5, s.getHandDeck());
             updateCoinsOfPlayer(s);
         }
+    }
+    
+    public void initNextTurn(){
+        cleanUpPlayedCards();
+        cleanUpHands();
+        currentSpeler.initRound();
+        checkDrawDeckSizeOfPlayer(currentSpeler, 5);
+        currentSpeler.getDrawDeck().moveAmountOfCardsToOtherDeck(5, currentSpeler.getHandDeck());
+        updateCoinsOfPlayer(currentSpeler);
+        
     }
     
     /**
@@ -127,6 +174,10 @@ public class GameEngine {
         }
     }
     
+    /**
+     * return true if currentPlayer has action cards in hand
+     * else false
+     */
     public boolean currentPlayerHasActionCards() {
         Deck handDeck = currentSpeler.getHandDeck();
         for(int i = 0; i < handDeck.getLengthFromDeck(); i++) {
@@ -137,7 +188,34 @@ public class GameEngine {
         }
         return false;
     }
+    
+    public boolean currentPlayerHasActions(){
+        if(currentSpeler.getActions() > 0){
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
+    public boolean currentPlayerHasBuys(){
+        if(currentSpeler.getBuys()> 0){
+            return true;
+        } else {
+            return false;
+        }
+    }
 
+    public boolean currentPlayerHasCoins(){
+        if(currentSpeler.getCoins() > 0){
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
+    /**
+     * used by nextPlayer
+     */
     private void cleanUpPlayedCards() {
         Deck discardDeck = currentSpeler.getDiscardDeck();
         while(!playedCards.isEmpty()){
@@ -147,28 +225,32 @@ public class GameEngine {
         }
     }
     
+    /**
+     * used by nextTurn
+     */
     private void cleanUpHands(){
-        for (int i = 0; i < Spelers.size(); i++){
-            Deck handDeck = Spelers.get(i).getHandDeck();
-            Deck discardDeck = Spelers.get(i).getDiscardDeck();
-            handDeck.moveAllCardsToOtherDeck(discardDeck);
-        }
+        Deck handDeck = currentSpeler.getHandDeck();
+        Deck discardDeck = currentSpeler.getDiscardDeck();
+        handDeck.moveAllCardsToOtherDeck(discardDeck);
+//        for (int i = 0; i < Spelers.size(); i++){
+//            Deck handDeck = Spelers.get(i).getHandDeck();
+//            Deck discardDeck = Spelers.get(i).getDiscardDeck();
+//            handDeck.moveAllCardsToOtherDeck(discardDeck);
+//        }
     }
     
     /**
      * turn increments and next player becomes currentPlayer
      */
     public void nextPlayer(){
+        initNextTurn();
         int currentSpelerIndex = Spelers.indexOf(currentSpeler);
         int nextSpelerIndex = (currentSpelerIndex + 1) % 2;
         currentSpeler = Spelers.get(nextSpelerIndex);
-        cleanUpPlayedCards();
     }
     
     public void nextTurn(){
-        cleanUpHands();
         turn++;
-        initTurn(false);
     }
     
     public void endGame(){
@@ -185,18 +267,27 @@ public class GameEngine {
         setWinner(searchPlayerHighestVP());
     }
     
+    /**
+     * used by endGame method
+     */
     private void calculateVictoryPoints(Speler s, Deck allCards){
         int Vpoints = 0;
         for(int i = 0; i < allCards.getLengthFromDeck(); i++){
             Card c = allCards.getCardAtIndex(i);
             if(c instanceof VictoryCard){
-                VictoryCard Vcard = (VictoryCard) c; //CASTING?
+                VictoryCard Vcard = (VictoryCard) c;
+                if(Vcard.getCardID() == 23){ //CardID 23 is gardens
+//                    SpecialVictoryCard.gardens();
+                }
                 Vpoints += Vcard.getVictoryPoints();
             }
         }
         s.setVictoryPoints(Vpoints);
     }
     
+    /**
+     * used by endGame method
+     */
     private ArrayList<Speler> searchPlayerHighestVP(){
         ArrayList<Speler> winners = new ArrayList<>();
         int highestVP = Spelers.get(0).getVictoryPoints();
@@ -217,6 +308,15 @@ public class GameEngine {
     public boolean isActionCard(int index){
         CardType c = currentSpeler.getHandDeck().getCardAtIndex(index).getType();    
         if (c == CardType.Action || c == CardType.ActionAttack) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
+    public boolean isTreasureCard(int index){
+        CardType c = currentSpeler.getHandDeck().getCardAtIndex(index).getType();    
+        if (c == CardType.Treasure) {
             return true;
         } else {
             return false;
@@ -249,6 +349,43 @@ public class GameEngine {
             }
         }
         s.coinsIncrement(amount);
+    }
+    
+//    private void executeAction(Card c){
+//        switch(c.getCardID()){
+//            case 1:
+//                SpecialAction cellar = new SpecialAction(this, 1, "cellar");
+//                cellar.actionIncrement(1);
+//                cellar.discardForNewCard(askDiscardedCards());
+//                break;
+//            case 2:
+//                Action market = new Action(this, 2, "market");
+//                market.drawAmountOfCards(1);
+//                market.actionIncrement(1);
+//                market.buysIncrement(1);
+//                market.coinsIncrement(1);
+//                break;
+//        }
+//    }
+    
+    public void removeCardFromHandDeckCurrentPlayer(int indexCard){
+        currentSpeler.getHandDeck().removeCardfromDeck(indexCard);
+    }
+    
+    public Card getCardFromHandDeckCurrentPlayer(int indexCard){
+        return currentSpeler.getHandDeck().getCardAtIndex(indexCard);
+    }
+
+    public ConsoleGame getCli(){
+        return cli;
+    }
+    
+    public int getCurrentPlayerAcions(){
+        return currentSpeler.getActions();
+    }
+    
+    public int getCurrentPlayerBuys(){
+        return currentSpeler.getBuys();
     }
     
     public int getCurrentPlayerCoins(){

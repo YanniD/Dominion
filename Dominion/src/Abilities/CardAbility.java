@@ -5,34 +5,35 @@
 // */
 //
 //package Abilities;
-//import dominion.Console;
+//
+//import dominion.ConsoleGame;
 //import dominion.Models.*;
 //import dominion.Speler;
 //import static dominion.Models.CardType.*;
 //import java.util.ArrayList;
 //
 //public class CardAbility {
-//    private Console c;
+//    private String name;
 //    
-//    public CardAbility(Console c){
-//        this.c = c;
+//    public CardAbility(String name){
+//        this.name = name;
 //    }
 //    
 //    public void drawAmountOfCards(Speler speler, int amount){
-//        Deck handDeck = speler.getHandDeck();
-//        Deck drawDeck = speler.getDrawDeck();
+//        Deck handDeck = getHandDeckOfPlayer(speler);
+//        Deck drawDeck = getDrawDeckOfPlayer(speler);
 //        checkAmountCardsInDrawDeck(speler, amount);
 //        drawDeck.moveAmountOfCardsToOtherDeck(amount, handDeck);
 //    }
 //    
-//    private void checkAmountCardsInDrawDeck(Speler speler, int cardsNeeded){
-//        Deck drawDeck = speler.getDrawDeck();
-//        Deck discardDeck = speler.getDiscardDeck();
-//        if (drawDeck.getLengthFromDeck() < cardsNeeded){
-//            discardDeck.randomShuffle();
-//            discardDeck.moveAllCardsToOtherDeck(drawDeck);
-//        }
-//    }
+////    public void checkAmountCardsInDrawDeck(Speler speler, int cardsNeeded){ // this function is implemented in GameEngine
+////        Deck drawDeck = getDrawDeckOfPlayer(speler);
+////        Deck discardDeck = speler.getDiscardDeck();
+////        if (drawDeck.getLengthFromDeck() < cardsNeeded){
+////            discardDeck.randomShuffle();
+////            discardDeck.moveAllCardsToOtherDeck(drawDeck);
+////        }
+////    }
 //    
 //    public void gainCardCostingUpTo(Speler speler, Pile chosenPile, int maxCost){
 //        Card card = chosenPile.getCard();
@@ -46,15 +47,40 @@
 //    public void actionIncrement(Speler speler, int increaseAmount){
 //        speler.actionIncrement(increaseAmount);
 //    }
+//    
+//    public void buysIncrement(Speler speler, int increaseAmount){
+//        speler.buysIncrement(increaseAmount);
+//    }
+//    
+//    public void coinsIncrement(Speler speler,int increaseAmount){
+//        speler.coinsIncrement(increaseAmount);
+//    }
+//    
+//    public Deck getHandDeckOfPlayer(Speler speler){
+//        return speler.getHandDeck();
+//    }
+//    
+//    public Deck getDiscardDeckOfPlayer(Speler speler){
+//        return speler.getDiscardDeck();
+//    }
+//    
+//    public Deck getDrawDeckOfPlayer(Speler speler){
+//        return speler.getDrawDeck();
+//    }
+//    
+//   
 //        
+//
+//            
 //    /**
 //      * Use in a while loop in the CLI
 //      *if stop action = true then is choice card = null
 //      */
+//    
 //    public void cellarAbility(Speler speler, int timesDiscarded,Card choiceCard, Boolean stopAction){
-//        Deck handDeck = speler.getHandDeck();
-//        Deck discardDeck = speler.getDiscardDeck();
-//        Deck drawDeck = speler.getDrawDeck();
+//        Deck handDeck = getHandDeckOfPlayer(speler);
+//        Deck discardDeck = getDiscardDeckOfPlayer(speler);
+//        Deck drawDeck = getDrawDeckOfPlayer(speler);
 //        if(!stopAction){
 //            handDeck.moveOneCardToOtherDeck(discardDeck,choiceCard);
 //            timesDiscarded +=1;
@@ -67,16 +93,16 @@
 //    }
 //    
 //    public void marketAbility(Speler speler, Card nieuweKaart){
-//        speler.actionIncrement(1);
-//        speler.buysIncrement(1); 
-//        speler.coinsIncrement(1);
+//        actionIncrement(speler, 1);
+//        buysIncrement(speler, 1);
+//        coinsIncrement(speler, 1);
 //        drawAmountOfCards(speler, 1);
 //    }
 //    
-//    public void militiaAbility(Speler speler, Speler OtherPlayer){
-//        speler.coinsIncrement(2);
-//        Deck handDeck = OtherPlayer.getHandDeck();
-//        Deck discardDeck = OtherPlayer.getDiscardDeck();
+//    public void militiaAbility(Speler speler, Speler otherPlayer){
+//        coinsIncrement(speler, 2);
+//        Deck handDeck = getHandDeckOfPlayer(otherPlayer);
+//        Deck discardDeck = otherPlayer.getDiscardDeck();
 //        handDeck.moveAmountOfCardsToOtherDeck(3, discardDeck);
 //    }
 //    
@@ -96,13 +122,12 @@
 //        drawAmountOfCards(speler, 2);
 //        // rest of ability coded in game engine
 //    }
-//
 //    
 //    public void remodelAbility(Speler speler){
-//        Deck handDeck = speler.getHandDeck();
+//        Deck handDeck = getHandDeckOfPlayer(speler);
 //        Card cardToTrash = handDeck.getCardAtIndex(c.remodelPickTrashCard(speler));
 //        int cost = cardToTrash.getCost();
-//        handDeck.removeCardAtIndex(handDeck.getIndexOf(cardToTrash));
+//        handDeck.removeCardfromDeck(handDeck.getIndexOf(cardToTrash));
 //        c.showAvaileblePiles();
 //        Card cardToGain = c.remodelPickGainCard(cost).getCard();
 //        handDeck.addToDeck(0, cardToGain);
@@ -114,20 +139,21 @@
 //    }
 //    
 //    public void villageAbility(Speler speler){
-//        speler.actionIncrement(2);
+//        actionIncrement(speler, 2);
 //        drawAmountOfCards(speler, 1);
 //    }
 //    
 //    public void woodercutterAbility(Speler speler){
-//        speler.buysIncrement(1);
-//        speler.coinsIncrement(2);
+//        buysIncrement(speler, 1);
+//        coinsIncrement(speler, 2);
 //    }
 //    
 //    public void workshopAbility(Speler speler){
 //        gainCardCostingUpTo(speler, c.workshopPickCard(), 4);
 //    }
+//
 //    
-//    
+//    /*
 //    public void adventurerAbility(Speler speler){
 //        Deck drawDeck = speler.getDrawDeck();
 //        Deck handDeck = speler.getHandDeck();
@@ -144,14 +170,16 @@
 //            //reveal ts cards
 //        }      
 //    }
+//    */
+//
 //    
 //    public void bureaucratAbility(Speler speler, Speler OtherPlayer, Pile silverPile){
-//        if (silverPile.getAmount() > 0){
+//        if (!silverPile.isEmpty()){
 //            speler.getDrawDeck().addToDeck(0, silverPile.getCard());
 //            silverPile.decrementAmount();
 //        } 
 //        
-//        Deck handDeck = OtherPlayer.getHandDeck();
+//        Deck handDeck = getHandDeckOfPlayer(OtherPlayer);
 //        ArrayList<Card> Vcards = new ArrayList<Card>();
 //        for (int i = 0; i < handDeck.getLengthFromDeck(); i++) {
 //            Card card = handDeck.getCardAtIndex(i);
@@ -204,6 +232,8 @@
 //        speler.actionIncrement(1);
 //    }
 //        
+//
+//    
 //    public void moneylenderAbility(Speler speler) {
 //        Deck handDeck = speler.getHandDeck();
 //        Card tmpCopperCard = new Card(25 , 4, "copper", Treasure, 60);
@@ -232,6 +262,33 @@
 //        speler.coinsIncrement(2);
 //    }
 //    
+//    public void drawCardsUntilDeckComplete(Speler speler, int deckSizeNeeded){
+//        Deck handDeck = getHandDeckOfPlayer(speler);
+//        int handDeckSize = handDeck.getLengthFromDeck();
+//        Deck drawDeck = getDrawDeck(speler);
+//        while (handDeckSize < deckSizeNeeded){
+//            Card card = drawDeck.getCardAtIndex(0);
+//            drawDeck.moveOneCardToOtherDeck(handDeck, card);
+//        }
+//    }
+//    
+//    /**
+//     * 
+//     * This method is used to set aside cards that equals with the right cardTypes. The user has to confirm yes or no if he want to move this to the discardDeck. If no or the type is diffrent they will be moved to the handDeck
+//     * @param setAside 
+//     */
+//    public void setAsideTypeOfCard(Speler speler,Card card, CardType cardTypeToSetAside, boolean setAside){
+//        Deck handDeck = getHandDeckOfPlayer(speler);
+//        Deck drawDeck = getDrawDeck(speler);
+//        Deck discardDeck = getDiscardDeck(speler);
+//        if (card.getType() == cardTypeToSetAside && setAside){
+//            drawDeck.moveOneCardToOtherDeck(discardDeck, card);
+//        }
+//        else{
+//            drawDeck.moveOneCardToOtherDeck(handDeck, card);
+//        }
+//    }
+//    
 //    public void libraryAbility(Speler speler){
 //        Deck handDeck = speler.getHandDeck();
 //        Deck drawDeck = speler.getDrawDeck();
@@ -255,8 +312,10 @@
 //     * ----------------------
 //     * player choses to discard or add actionCard to deck
 //     */
+//    
+//    //I dont think this is still needed because of the setasidetypeofCard method
 //    public void discardActionCard(Speler speler, Card actionCard, boolean choiceToKeepCard) {
-//        Deck drawDeck = speler.getDrawDeck();
+//        Deck drawDeck = getDrawDeckOfPlayer(speler);
 //        if (choiceToKeepCard) {
 //            drawDeck.moveOneCardToOtherDeck(speler.getHandDeck(), actionCard);
 //        } else {
@@ -265,7 +324,7 @@
 //    }
 //    
 //    public void spyAbility(Speler speler, Speler OtherPlayer){
-//        Deck drawDeck = speler.getDrawDeck();
+//        Deck drawDeck = getDrawDeckOfPlayer(speler);
 //        drawDeck.moveOneCardToOtherDeck(speler.getHandDeck(), drawDeck.getCardAtIndex(0));
 //        speler.actionIncrement(1);
 //        
@@ -276,7 +335,7 @@
 //        
 //        if (c.spyConfirmation()) {
 //            drawDeck.moveOneCardToOtherDeck(speler.getDiscardDeck(), drawDeck.getCardAtIndex(0));
-//            Deck drawDeckVictim = OtherPlayer.getDrawDeck();
+//            Deck drawDeckVictim = getDrawDeckOfPlayer(OtherPlayer);
 //            drawDeckVictim.moveOneCardToOtherDeck(OtherPlayer.getDiscardDeck(), drawDeckVictim.getCardAtIndex(0));
 //        }
 //    }
@@ -293,12 +352,13 @@
 //        }
 //        int choiceCard = c.thiefCardChoice();
 //        if(choiceCard <= 0 &&choiceCard <3) {
+// 
 //            drawDeckVictim.moveOneCardToOtherDeck(speler.getHandDeck(), drawDeckVictim.getCardAtIndex(choiceCard));
 //        }
 //    } 
 //    
 //    public void witchAbility(Speler speler, Speler otherPlayer,Card curse){
-//        speler.getDrawDeck().moveAmountOfCardsToOtherDeck(2, speler.getHandDeck());
+//        getDrawDeckOfPlayer(speler).moveAmountOfCardsToOtherDeck(2, speler.getHandDeck());
 //        otherPlayer.getHandDeck().addToDeck(0, curse);
 //    }
 //    
@@ -314,21 +374,10 @@
 //        speler.coinsIncrement(3);
 //    }
 //    
-//    public void estateAbility(Speler speler){
-//        speler.victoryPointsIncrement(1);
-//    }
-//    
-//    public void duchyAbility(Speler speler){
-//        speler.victoryPointsIncrement(3);
-//    }
-//    
-//    public void provinceAbilty(Speler speler){
-//        speler.victoryPointsIncrement(6);
-//    }
-//    
-//    public void gardensAblity(Speler speler) {
-//        int amountCards = speler.getDrawDeck().getLengthFromDeck();
-//        speler.victoryPointsIncrement(amountCards / 10);
-//    }
+//    // implement this in GameEngine
+////    public void gardensAblity(Speler speler) {
+////        int amountCards = speler.getDrawDeck().getLengthFromDeck();
+////        speler.victoryPointsIncrement(amountCards / 10);
+////    }
 //       
 //}
