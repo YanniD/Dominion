@@ -128,6 +128,9 @@ public class DatabaseService {
                 int victoryPoints = rs.getInt("VictoryPoints");
                 card = CreateVictoryCard(cardID,cost,title,victoryPoints,amount);
                 break;
+            case ActionReaction:
+                card = CreateActionReacionCard(cardID,cost,title,amount);
+                break;
             default: 
                 throw new NotImplemented();
         }   
@@ -141,8 +144,12 @@ public class DatabaseService {
         return new dominion.Models.ActionCard(cardID, cost, title, CardType.Action, amount);
     }
     
-     private dominion.Models.ActionCard CreateActionAttackCard(int cardID,int cost, String title,int amount){
+    private dominion.Models.ActionCard CreateActionAttackCard(int cardID,int cost, String title,int amount){
         return new dominion.Models.ActionCard(cardID, cost, title, CardType.ActionAttack, amount);
+    }
+    
+    private dominion.Models.ActionCard CreateActionReacionCard(int cardID,int cost, String title,int amount){
+        return new dominion.Models.ActionCard(cardID, cost, title, CardType.ActionReaction, amount);
     }
     
     private dominion.Models.TreasureCard CreateTreasureCard(int cardID, int cost, String title, int worth,int amount){

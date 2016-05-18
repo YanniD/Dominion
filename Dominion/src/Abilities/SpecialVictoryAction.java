@@ -6,11 +6,12 @@
 package Abilities;
 
 import dominion.GameEngine;
+import dominion.Speler;
 
 public class SpecialVictoryAction extends Action { 
     
-     public SpecialVictoryAction(GameEngine engine){
-        super(engine);
+    public SpecialVictoryAction(GameEngine engine, Speler actionPlayer){
+        super(engine, actionPlayer);
     }
     
     

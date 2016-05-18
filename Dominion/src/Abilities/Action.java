@@ -6,6 +6,7 @@
 package Abilities;
 
 import dominion.GameEngine;
+import dominion.Models.Card;
 import dominion.Models.Deck;
 import dominion.Speler;
 
@@ -13,9 +14,9 @@ public class Action {
     private GameEngine engine;
     private Speler actionPlayer;
     
-    public Action(GameEngine ge){
+    public Action(GameEngine ge, Speler cardPlayer){
         this.engine = ge;
-        this.actionPlayer = engine.getCurrentSpeler();
+        this.actionPlayer = cardPlayer;
     }
     
     public void drawAmountOfCards(int amount){
@@ -24,8 +25,8 @@ public class Action {
         drawDeck.moveAmountOfCardsToOtherDeck(amount, handDeck);
     }
     
-    public void trashCard(int indexCard){
-        actionPlayer.getHandDeck().removeCardfromDeck(indexCard);
+    public void trashCard(Card c){
+        actionPlayer.getHandDeck().removeCardFromDeck(c);
     }
     
     public void actionIncrement(int increaseAmount){
@@ -55,5 +56,21 @@ public class Action {
     public GameEngine getEngine(){
         return engine;
     }
+
+    public Speler getActionPlayer() {
+        return actionPlayer;
+    }
+    
+    public void revealCard(Speler s, Card c){
+        engine.getCli().revealCard(s, c);
+    }
+    
+    public void trashSpecifiedAmountOfCards(int amount){
+        for (int i = 0 ; i <amount ; i++){
+            Card chosenCardToTrash = engine.getCli().chooseACardToTrash();
+            trashCard(chosenCardToTrash);
+        }
+    }
+    
     
 }

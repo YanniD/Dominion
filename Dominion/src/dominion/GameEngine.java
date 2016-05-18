@@ -22,11 +22,12 @@ public class GameEngine {
     private ConsoleGame cli;
     private ActionHandler actionHandler;
     private int turn;
-    private ArrayList<Speler> winner; //list makes draws possible
+    private boolean reactionInGame;
     private Speler currentSpeler;
     private LinkedList<Speler> Spelers;
     private LinkedList<Card> playedCards;
     private ArrayList<Pile> allPiles;
+    private ArrayList<Speler> winner;
     private DatabaseService dbs;
     
     public GameEngine(){
@@ -86,17 +87,51 @@ public class GameEngine {
             return false;
         }
     }
+     
+    private void checkForReactionCard(){
+        Deck handDeck = currentSpeler.getHandDeck();
+        for(int i = 0; i < handDeck.getLengthFromDeck(); i++){
+            Card c = handDeck.getCardAtIndex(i);
+            if(c.getCardID() == 5){ //cardID 5 is moat
+                reactionInGame = true;
+            }
+        }
+    }
+     
+    private void askForReactions(){
+        for(int i = 0; i < Spelers.size(); i++){
+            Speler s = Spelers.get(i);
+            if(s != currentSpeler && hasReactionCardsInHand(s)){
+                Card reactionCard = cli.askToThrowReaction(s);
+                actionHandler.executeAction(reactionCard, s);
+                s.setEffected(false);
+            }
+        }
+    }
     
+    /**
+     * if a reactionCard is in the game and the currentPlayer plays an actionCard
+     * it will keep asking to other players with a reactionCard to throw it
+     */
+    private void checkForReaction(Card c){
+        if(reactionInGame && c.getType() == CardType.ActionAttack){
+            askForReactions();
+        } else if(c.getType() == CardType.ActionReaction){
+            reactionInGame = false;
+        }
+    }
+
     /**
      * executes the chosen action card from hand
      */ 
     public void playCard(int indexCard){
         Deck handDeck = currentSpeler.getHandDeck();
         Card cardToPlay = handDeck.getCardAtIndex(indexCard);
+        checkForReaction(cardToPlay);
         playedCards.add(cardToPlay);
         handDeck.removeCardfromDeck(indexCard);
         currentSpeler.actionDecrement(1);
-        actionHandler.executeAction(cardToPlay);
+        actionHandler.executeAction(cardToPlay, currentSpeler);
     }
     
     public void endActionPhase(){
@@ -126,8 +161,7 @@ public class GameEngine {
      * returns true if coins >= cost of card
      * returns false if not
      */
-    public boolean isCardBuyable(int indexPile){
-        int coins = currentSpeler.getCoins();
+    public boolean isCardBuyable(int coins, int indexPile){
         int cost = allPiles.get(indexPile).getCard().getCost();
         if(coins >= cost){
             return true;
@@ -157,8 +191,8 @@ public class GameEngine {
         currentSpeler.initRound();
         checkDrawDeckSizeOfPlayer(currentSpeler, 5);
         currentSpeler.getDrawDeck().moveAmountOfCardsToOtherDeck(5, currentSpeler.getHandDeck());
+        checkForReactionCard();
         updateCoinsOfPlayer(currentSpeler);
-        
     }
     
     /**
@@ -183,6 +217,17 @@ public class GameEngine {
         for(int i = 0; i < handDeck.getLengthFromDeck(); i++) {
             CardType cardToCheck = handDeck.getCardAtIndex(i).getType();
             if (cardToCheck == CardType.Action || cardToCheck == CardType.ActionAttack){
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    private boolean hasReactionCardsInHand(Speler s){
+        Deck handDeck = s.getHandDeck();
+        for(int i = 0; i < handDeck.getLengthFromDeck(); i++){
+            Card c = handDeck.getCardAtIndex(i);
+            if(c.getType() == CardType.ActionReaction){
                 return true;
             }
         }
@@ -323,6 +368,15 @@ public class GameEngine {
         }
     }
     
+    public boolean isReactionCard(Speler s, int index){
+        CardType c = s.getHandDeck().getCardAtIndex(index).getType();
+        if (c == CardType.ActionReaction) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
     /**
      * used by askBuy in ConsoleGame
      */
@@ -351,29 +405,16 @@ public class GameEngine {
         s.coinsIncrement(amount);
     }
     
-//    private void executeAction(Card c){
-//        switch(c.getCardID()){
-//            case 1:
-//                SpecialAction cellar = new SpecialAction(this, 1, "cellar");
-//                cellar.actionIncrement(1);
-//                cellar.discardForNewCard(askDiscardedCards());
-//                break;
-//            case 2:
-//                Action market = new Action(this, 2, "market");
-//                market.drawAmountOfCards(1);
-//                market.actionIncrement(1);
-//                market.buysIncrement(1);
-//                market.coinsIncrement(1);
-//                break;
-//        }
-//    }
-    
-    public void removeCardFromHandDeckCurrentPlayer(int indexCard){
-        currentSpeler.getHandDeck().removeCardfromDeck(indexCard);
+    public boolean isPlayerEffected(Speler s){
+        return s.isEffected();
     }
     
-    public Card getCardFromHandDeckCurrentPlayer(int indexCard){
-        return currentSpeler.getHandDeck().getCardAtIndex(indexCard);
+    public void removeCardFromHandDeck(Speler s, int indexCard){
+        s.getHandDeck().removeCardfromDeck(indexCard);
+    }
+    
+    public Card getCardFromHandDeck(Speler s, int indexCard){
+        return s.getHandDeck().getCardAtIndex(indexCard);
     }
 
     public ConsoleGame getCli(){
@@ -392,8 +433,8 @@ public class GameEngine {
         return currentSpeler.getCoins();
     }
     
-    public int getLengthHandDeckOfCurrentPlayer(){
-        return currentSpeler.getHandDeck().getLengthFromDeck();
+    public int getLengthHandDeckPlayer(Speler s){
+        return s.getHandDeck().getLengthFromDeck();
     }
     
     public Speler getLastSpeler(){

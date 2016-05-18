@@ -18,6 +18,7 @@ public class Speler {
     private int buys;
     private int coins;
     private int victoryPoints;
+    private boolean effected;
     
     //constructor
     public Speler(String name, int ID, DatabaseService dbs){
@@ -37,6 +38,10 @@ public class Speler {
         actions = 1;
         buys = 1;
         coins = 0;
+    }
+    
+    public void setEffected(boolean b){
+        effected = b;
     }
     
     //actie verminderen per actiekaart gespeeld
@@ -71,7 +76,10 @@ public class Speler {
     public void setVictoryPoints(int amount){
         this.victoryPoints = amount;
     }
-    
+
+    public boolean isEffected() {
+        return effected;
+    }
     public String getPlayerName() {
         return name;
     }

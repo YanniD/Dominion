@@ -13,5 +13,6 @@ public enum CardType {
     Action,
     ActionAttack,
     Treasure,
-    Victory
+    Victory,
+    ActionReaction
 }

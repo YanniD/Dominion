@@ -12,7 +12,9 @@ import dominion.Models.Pile;
 import dominion.Models.SetConfig;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Scanner;
 
 public class ConsoleGame {
@@ -137,11 +139,8 @@ public class ConsoleGame {
             showHeading();
             showGameCards();
             showCurrentSituation();
-            askAction(); // play card --> check ability --> execute
-            askBuy(); // buy card --> check cost and coins --> add to handddeck
-//            System.out.println("drawDecksize: " + Engine.getCurrentSpeler().getDrawDeck().getLengthFromDeck() + " || " + Engine.getCurrentSpeler().getDrawDeck().toString());
-//            System.out.println("handDecksize: " + Engine.getCurrentSpeler().getHandDeck().getLengthFromDeck() + " || " + Engine.getCurrentSpeler().getHandDeck().toString());
-//            System.out.println("discardDecksize: " + Engine.getCurrentSpeler().getDiscardDeck().getLengthFromDeck() + " || " + Engine.getCurrentSpeler().getDiscardDeck().toString());
+            askAction();
+            askBuy(); 
             if (engine.getCurrentSpeler() == engine.getLastSpeler()) {
                 checkIfFinished = true;
                 engine.nextTurn(); // moves all handDecks to discardDecks --> everyone draws 5 new cards from drawDeck + next turn
@@ -170,12 +169,12 @@ public class ConsoleGame {
     
     public void showCurrentSituation(){
         System.out.println("\nActions: " + engine.getCurrentPlayerAcions() + " || Buys : " + engine.getCurrentPlayerBuys() + " || Coins: " + engine.getCurrentPlayerCoins());
-        showHand();
+        showHand(engine.getCurrentSpeler());
     }
     
-    private void showHand(){
-        Deck handDeck = engine.getCurrentSpeler().getHandDeck();
-        System.out.print("Hand : ");
+    private void showHand(Speler s){
+        Deck handDeck = s.getHandDeck();
+        System.out.print("Player " + s.getPlayerName() + " || Hand : ");
         for (int i = 0; i < handDeck.getLengthFromDeck() ; i++){
             Card card = handDeck.getCardAtIndex(i);
             String cardTitle = card.getTitle();
@@ -185,25 +184,29 @@ public class ConsoleGame {
     }
    
     public void askAction(){
-        while (engine.currentPlayerHasActionCards() && engine.currentPlayerHasActions()) {
-            System.out.println("\nActions left: " + engine.getCurrentPlayerAcions() + " || Pick a card to play (Enter -1 to end action phase): ");
-            showHand();
-            int pickedCard = scanInt();
-            int maxInput = engine.getLengthHandDeckOfCurrentPlayer();
-            while((pickedCard < -1 || maxInput < pickedCard) || ((0 <= pickedCard && pickedCard <= maxInput) ? !engine.isActionCard(pickedCard) : false)){
-                if(pickedCard < -1 || maxInput < pickedCard){
-                    System.out.println("Pick a card to buy (give a correct input): ");
-                } else {
-                    System.out.println("Pick a ACTION card to play");
+        if(engine.currentPlayerHasActionCards()){
+            while (engine.currentPlayerHasActions()) {
+                System.out.println("\nActions left: " + engine.getCurrentPlayerAcions() + " || Pick a card to play (Enter -1 to end action phase): ");
+                showHand(engine.getCurrentSpeler());
+                int pickedCard = scanInt();
+                int maxInput = engine.getLengthHandDeckPlayer(engine.getCurrentSpeler());
+                while((pickedCard < -1 || maxInput < pickedCard) || ((0 <= pickedCard && pickedCard <= maxInput) ? !engine.isActionCard(pickedCard) : false)){
+                    if(pickedCard < -1 || maxInput < pickedCard){
+                        System.out.println("Pick a card to buy (give a correct input): ");
+                    } else {
+                        System.out.println("Pick a ACTION card to play");
+                    }
+                    pickedCard = scanInt();
                 }
-                pickedCard = scanInt();
+                if(pickedCard == -1){
+                    System.out.println("Ending buy phase");
+                    engine.endActionPhase();
+                } else {
+                    engine.playCard(pickedCard);
+                }
             }
-            if(pickedCard == -1){
-                System.out.println("Ending buy phase");
-                engine.endActionPhase();
-            } else {
-                engine.playCard(pickedCard);
-            }
+        } else {
+            System.out.println("No actioncards in hand, moving to buy phase...");
         }
     }
 
@@ -211,7 +214,7 @@ public class ConsoleGame {
         while (engine.currentPlayerHasCoins() && engine.currentPlayerHasBuys()){
             System.out.println("Buys left: " + engine.getCurrentSpeler().getBuys()+ " || Coins left: " + engine.getCurrentPlayerCoins() + " || Pick a card to buy (if you have no coins you can have a free copper. Enter -1 to end buy phase): ");
             int pickedCard = scanInt();
-            while((pickedCard < -1 || 15 < pickedCard) || ((0 <= pickedCard && pickedCard <= 15) ? engine.isPileEmpty(pickedCard) : false) || ((0 <= pickedCard && pickedCard <= 15) ? !engine.isCardBuyable(pickedCard) : false)){
+            while((pickedCard < -1 || 15 < pickedCard) || ((0 <= pickedCard && pickedCard <= 15) ? engine.isPileEmpty(pickedCard) : false) || ((0 <= pickedCard && pickedCard <= 15) ? !engine.isCardBuyable(engine.getCurrentPlayerCoins(), pickedCard) : false)){
                 if(pickedCard < -1 || 15 < pickedCard){
                     System.out.println("Pick a card to buy (give a correct input): ");
                 } else if(engine.isPileEmpty(pickedCard)) {
@@ -271,24 +274,48 @@ public class ConsoleGame {
 /*--------------------------------------------*/
 /*------------ACTION Communication------------*/  
 /*--------------------------------------------*/ 
+  
+    public void revealCard(Speler s, Card c){
+        System.out.println("Player : " + engine);
+    }
+    
+    public Card askToThrowReaction(Speler s){
+        System.out.println("Player " + engine.getCurrentSpeler().getPlayerName() + " has played an attack card, pick a reaction card (Enter -1 to stop): \n");
+        showHand(s);
+        int pickedCard = scanInt();
+        int maxInput = engine.getLengthHandDeckPlayer(s);
+        while(pickedCard < -1 || maxInput < pickedCard || ((0 <= pickedCard && pickedCard <= 15) ? !engine.isReactionCard(s, pickedCard) : false)){
+            if(pickedCard < 0 || maxInput < pickedCard){
+                System.out.println("Give a correct input: ");
+            } else{
+                System.out.println("pick a REACTION card: ");
+            }
+            pickedCard = scanInt();
+        }
+        if(pickedCard == -1){
+            return null;
+        } else {
+            return engine.getCardFromHandDeck(s, pickedCard);
+        }
+    }
     
     public ArrayList<Card> askCardsToDiscard(){
         int cardsDiscarded = 0;
         boolean stop = false;
-        int maxCardsToDiscard = engine.getLengthHandDeckOfCurrentPlayer();
+        int maxCardsToDiscard = engine.getLengthHandDeckPlayer(engine.getCurrentSpeler());
         ArrayList<Card> discardCards = new ArrayList<>();
         while(cardsDiscarded < maxCardsToDiscard && !stop){
             System.out.println("Pick a card to discard (Enter -1 to stop): ");
-            showHand();
+            showHand(engine.getCurrentSpeler());
             int pickedCard = scanInt();
-            while(pickedCard < -1 && engine.getLengthHandDeckOfCurrentPlayer() < pickedCard){
+            while(pickedCard < -1 && maxCardsToDiscard < pickedCard){
                 System.out.println("Pick a card to discard (give a correct input): ");
                 pickedCard = scanInt();
             }
             if(pickedCard > -1){
-                Card chosenCard = engine.getCardFromHandDeckCurrentPlayer(pickedCard);
+                Card chosenCard = engine.getCardFromHandDeck(engine.getCurrentSpeler(), pickedCard);
                 discardCards.add(chosenCard);
-                engine.removeCardFromHandDeckCurrentPlayer(pickedCard);
+                engine.removeCardFromHandDeck(engine.getCurrentSpeler(), pickedCard);
                 cardsDiscarded++;
             } else {
                 stop = true;
@@ -297,16 +324,114 @@ public class ConsoleGame {
         return discardCards;
     }
     
-    public int askcardToTrash(){
+    //TODO move into engine?
+    public Map<Speler, ArrayList<Card>> askOtherPlayersToDiscardTo(int cardsLeftInHand){
+        LinkedList<Speler> Spelers = engine.getSpelers();
+        Map<Speler, ArrayList<Card>> SpelersDiscardedCards = new HashMap<Speler, ArrayList<Card>>();
+        for(int i = 0; i < Spelers.size(); i++){
+            Speler s = Spelers.get(i);
+            ArrayList<Card> discardedCards = new ArrayList<>();
+            while(s.getHandDeck().getLengthFromDeck() > 3 && s != engine.getCurrentSpeler()){
+                System.out.println("Player " + s.getPlayerName() + " discard untill you have 3 cards left: ");
+                showHand(s);
+                int pickedCard = scanInt();
+                while(pickedCard < 0 || s.getHandDeck().getLengthFromDeck() < pickedCard){
+                    System.out.println("Give a correct input: ");
+                    pickedCard = scanInt();
+                }
+                Card c = engine.getCardFromHandDeck(s, pickedCard); // move into engine.
+                engine.removeCardFromHandDeck(s, pickedCard); // move into engine?
+                discardedCards.add(c);
+            }
+            SpelersDiscardedCards.put(s, discardedCards);
+        }
+        System.out.println("Attack completed...");
+        return SpelersDiscardedCards;
+    }
+   
+    //TODO move into engine?
+    public Card askcardToTrash(Speler s){
         System.out.println("Select a treasure card to trash (gain a card costing up to 3 more coins): ");
+        showHand(s);
         int pickedCard = scanInt();
-        while(pickedCard < 0 || engine.getLengthHandDeckOfCurrentPlayer() < pickedCard || ((0 <= pickedCard && pickedCard <= engine.getLengthHandDeckOfCurrentPlayer()) ? engine.isTreasureCard(pickedCard) : false)){
-            if(pickedCard < 0 || engine.getLengthHandDeckOfCurrentPlayer() < pickedCard){
+        int maxCardsToDiscard = engine.getLengthHandDeckPlayer(engine.getCurrentSpeler());
+        while(pickedCard < 0 || maxCardsToDiscard < pickedCard || ((0 <= pickedCard && pickedCard <= maxCardsToDiscard) ? !engine.isTreasureCard(pickedCard) : false)){
+            if(pickedCard < 0 || maxCardsToDiscard < pickedCard){
                 System.out.println("Give a correct input: ");
             } else {
                 System.out.println("Select a TREASURE card: ");
             }
+            pickedCard = scanInt();
         }
-        return pickedCard;
+        return s.getHandDeck().getCardAtIndex(pickedCard); //move to engine?
+    }
+    
+    public Card gainCardCostingUpTo(int cost){
+        int pickedCard = scanInt();
+        while((pickedCard < -1 || 15 < pickedCard) || ((0 <= pickedCard && pickedCard <= 15) ? engine.isPileEmpty(pickedCard) : false) && ((0 <= pickedCard && pickedCard <= 15) ? engine.isCardBuyable(cost, pickedCard) : false)){
+            if(pickedCard < -1 || 15 < pickedCard){
+                System.out.println("Pick a card to buy (give a correct input): ");
+            } else if(engine.isPileEmpty(pickedCard)) {
+                System.out.println("This pile is empty please pick another card to buy: ");
+            } else {
+                System.out.println("This card costs too much, please pick another card: ");
+            }
+            pickedCard = scanInt();
+        }
+        if(pickedCard == -1){
+            return null;
+        }
+        engine.getPiles().get(pickedCard).decrementAmount();    // dit in de engine?
+        return engine.getPiles().get(pickedCard).getCard();     //dit in de engine?
+    }
+    
+    public boolean OptionToDiscardAll(){
+        System.out.println("do you want to discard , 1 = yes or 2 = no");
+        int option = scanInt();
+        while(option < 1 || 2 < option){
+            System.out.println("Wrong input , Please choose again");
+            System.out.println("do you want to discard , 1 = yes or 2 = no");
+            option = scanInt();
+        }
+        if (option ==1){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+    
+    public Card askTrashCopperCard(){
+        System.out.println("Do you want to trash a copper card? Give index of a copper card or -1 if you don't want to trash");
+        int chosenIndex = scanInt();
+        int cardID = engine.getCurrentSpeler().getHandDeck().getCardAtIndex(chosenIndex).getCardID();
+        int maxInput = engine.getCurrentSpeler().getHandDeck().getLengthFromDeck();
+        while (chosenIndex < -1 || maxInput < chosenIndex || ((0 <= chosenIndex && chosenIndex <= maxInput) ? cardID != 25 : false)){
+            if(cardID != 25){
+                System.out.println("This is not a copper card");
+            } else if(chosenIndex == -1){
+                return null;
+            }
+            else{
+            System.out.println("Wrong input, try again: ");
+            }
+            chosenIndex = scanInt();
+        }
+        return engine.getCurrentSpeler().getHandDeck().getCardAtIndex(cardID);
+    }
+    
+    public Card chooseACardToTrash(){
+        System.out.println("Choose a card you want to discard (Enter -1 to stop): ");
+        int pickedCard = scanInt();
+        int handDeckSize = engine.getCurrentSpeler().getHandDeck().getLengthFromDeck();
+        while(pickedCard < -1 || pickedCard > handDeckSize){
+            System.out.println("Wrong input, try again: ");
+            pickedCard = scanInt();
+        }
+        if(pickedCard == -1){
+            return null;
+        } else {
+            return engine.getCardFromHandDeck(engine.getCurrentSpeler(), pickedCard);
+        }
     }
 }

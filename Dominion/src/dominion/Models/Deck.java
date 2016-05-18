@@ -49,6 +49,10 @@ public class Deck {
         cards.remove(index);
     }
     
+    public void removeCardFromDeck(Card c){
+        cards.remove(c);
+    }
+    
     public int getIndexOf(Card c){
         return cards.indexOf(c);
     }

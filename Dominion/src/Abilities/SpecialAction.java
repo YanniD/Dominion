@@ -15,8 +15,8 @@ import java.util.ArrayList;
 
 public class SpecialAction extends Action { 
     
-    public SpecialAction(GameEngine engine){
-        super(engine);
+    public SpecialAction(GameEngine engine, Speler actionPlayer){
+        super(engine, actionPlayer);
     }
     
     /**
@@ -30,7 +30,7 @@ public class SpecialAction extends Action {
         drawDeck.moveAmountOfCardsToOtherDeck(discardedCards.size(), handDeck);
     }
     
-    public void trashToGain(int indexTScard){
+    public void trashTStoGainTS(int indexTScard){
         Pile higherTSpile = null;
         Deck handDeck = super.getHandDeckOfPlayer();
         int cardID = handDeck.getCardAtIndex(indexTScard).getCardID();
@@ -45,4 +45,14 @@ public class SpecialAction extends Action {
         higherTSpile.decrementAmount();
     }
 
+    public void gainCard(Card card){
+        super.getDiscardDeckOfPlayer().addToDeck(0, card);
+    }
+    
+    public void discardAllCards(Boolean optionToDiscard){
+        if(optionToDiscard){
+            Deck discardDeck = super.getDiscardDeckOfPlayer();
+            super.getHandDeckOfPlayer().moveAllCardsToOtherDeck(discardDeck);
+        }
+    }
 }
